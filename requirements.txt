@@ -1,3 +1,7 @@
-qiskit
-qiskit-ibm-runtime
+ipykernel
+qiskit-terra>=0.24
+qiskit-aer>=0.12
+qiskit-ibm-runtime>=0.20
+matplotlib
+seaborn
 pylatexenc
