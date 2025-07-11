@@ -10,3 +10,11 @@ How QMC works:
 - By averaging across many paths, QMC approximates quantities that would otherwise be too complex to calculate exactly.
 
 ## 2. [Functional Analysis and Normed Vector Spaces](https://en.wikipedia.org/wiki/Functional_analysis)
+
+## 3. [Bloch Sphere Simulator](https://bloch.kherb.io/)
+- Hadamard gate (H)
+- Pauli gate (X,Y,Z)
+- Phase gate (S,S+,T,T+), conditional
+- H, X, Y, Z, S, S+ are under the Clifford gate set since they keep it on an axis.
+
+
