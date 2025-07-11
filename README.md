@@ -16,6 +16,6 @@ How QMC works:
 - Pauli gate (X,Y,Z)
 - Phase gate (S,St,T,Tt), conditional
 - H, X, Y, Z, S, St are under the Clifford gate set since they keep it on an axis.
+    S, St pi/2
+    T, Tt pi/4
 
-S, St pi/2
-T, Tt pi/4
