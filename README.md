@@ -14,7 +14,8 @@ How QMC works:
 ## 3. [Bloch Sphere Simulator](https://bloch.kherb.io/)
 - Hadamard gate (H)
 - Pauli gate (X,Y,Z)
-- Phase gate (S,S+,T,T+), conditional
-- H, X, Y, Z, S, S+ are under the Clifford gate set since they keep it on an axis.
+- Phase gate (S,St,T,Tt), conditional
+- H, X, Y, Z, S, St are under the Clifford gate set since they keep it on an axis.
 
-
+S, St pi/2
+T, Tt pi/4
