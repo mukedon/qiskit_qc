@@ -1,7 +1,7 @@
 ipykernel
-qiskit-terra>=1.0.0
 qiskit-aer>=0.13.0
 qiskit-ibm-runtime>=0.20
-matplotlib
-seaborn
 pylatexenc
+sympy
+
+#pip list | findstr qiskit
