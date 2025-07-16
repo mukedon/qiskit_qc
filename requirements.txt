@@ -1,6 +1,7 @@
 ipykernel
 qiskit-aer>=0.13.0
 qiskit-ibm-runtime>=0.20
+qiskit-ibm-catalog
 pylatexenc
 sympy
 
