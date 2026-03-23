@@ -1,0 +1,30 @@
+### Virtual Environment (commmands in terminal)
+* Setting up: `python -m venv .venv`
+* Activating: `.venv\Scripts\Activate.ps1`
+
+### Installing qiskit libraries 
+* Install Qiskit SDK: `pip install qiskit`
+* Install Qiskit Runtime: `pip install qiskit-ibm-runtime`
+* Install Qiskit visualization: `pip install qiskit[visualization]`
+* Install Qiskit AerSimulator: `pip install qiskit-aer`
+* Install Qiskit experiments: `python -m pip install qiskit-experiments`
+
+### Installing jupyter
+* Install Jupyter Notebook: `pip install jupyter`
+
+### Installing qiskit-device-benchmarking
+* `git clone git@github.com:qiskit-community/qiskit-device-benchmarking.git`
+* `cd qiskit-device-benchmarking`
+* `pip install .`
+
+### Installing pytest
+* `pip install pytest`
+* `pytest`
+
+### Install Lint
+* `pip install ruff`
+* `ruff check      # Lint files`
+* `ruff format     # Format files`
+
+### Install Stim
+* `pip install stim`
