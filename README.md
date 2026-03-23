@@ -1,10 +1,10 @@
-# ⚛️ Quantum Computing — A Personal Study Repository
+# Quantum Computing — A Personal Study Repository
 
 > A curated collection of notes, tutorials, and explorations on quantum computing — from foundational theory to advanced techniques.
 
 ---
 
-## 📖 About This Repository
+## About This Repository
 
 This repository documents a personal journey through quantum computing, spanning both the mathematical foundations and modern algorithmic techniques. It is organized as a self-contained reference: whether you are a student taking your first steps into quantum mechanics, or a researcher looking for concise notes on a specific topic, you should find something useful here.
 
@@ -12,9 +12,9 @@ The materials are a mix of **Jupyter notebooks**, **written tutorials**, and **h
 
 ---
 
-## 🗺️ Repository Map
+## Repository Map
 
-### 🌱 Introductory Tutorials
+### Introductory Tutorials
 Start here if you are new to quantum computing. These tutorials cover the core concepts needed to understand the rest of the repository:
 
 - Qubits, superposition, and entanglement
@@ -26,7 +26,7 @@ Start here if you are new to quantum computing. These tutorials cover the core c
 
 ---
 
-### 📐 ZX-Calculus
+### ZX-Calculus
 An introduction to the **ZX-calculus** — a graphical language for reasoning about quantum circuits and quantum processes. Topics include:
 
 - Z-spiders and X-spiders
@@ -37,7 +37,7 @@ An introduction to the **ZX-calculus** — a graphical language for reasoning ab
 
 ---
 
-### 🔄 Cliffordization
+### Cliffordization
 Notes and explorations on **Clifford circuits** — the class of quantum circuits that can be efficiently simulated classically. Topics include:
 
 - The Clifford group and Clifford gates (H, S, CNOT)
@@ -47,7 +47,7 @@ Notes and explorations on **Clifford circuits** — the class of quantum circuit
 
 ---
 
-### ⏱️ Trotterization
+### Trotterization
 A detailed look at **Trotterization** (Trotter–Suzuki decomposition) — a core technique for simulating quantum Hamiltonians on a quantum computer. Topics include:
 
 - Product formulas and their error bounds
@@ -57,7 +57,7 @@ A detailed look at **Trotterization** (Trotter–Suzuki decomposition) — a cor
 
 ---
 
-### 🛡️ Surface Codes
+### Surface Codes
 An introduction to **surface codes** — the leading candidate for fault-tolerant quantum computation. Topics include:
 
 - The toric code and surface code geometry
@@ -67,12 +67,12 @@ An introduction to **surface codes** — the leading candidate for fault-toleran
 
 ---
 
-### 📝 Handwritten Theory Notes
+### Handwritten Theory Notes
 Short, dense handwritten notes covering foundational and advanced theory. These are intended as quick references and thinking aids, not polished expositions. Topics include quantum information theory, density matrices, channels, entanglement measures, and more.
 
 ---
 
-## 🧭 Suggested Learning Path
+## Suggested Learning Path
 
 If you are working through this repository from scratch, here is a recommended order:
 
@@ -94,7 +94,7 @@ Feel free to jump to any section directly if you already have the prerequisites.
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 Most of the material assumes familiarity with:
 
@@ -109,7 +109,7 @@ Some sections (Trotterization, Surface Codes) additionally assume comfort with:
 
 ---
 
-## 📚 References & Further Reading
+## References & Further Reading
 
 Here are some resources that complement the material in this repository:
 
@@ -121,13 +121,13 @@ Here are some resources that complement the material in this repository:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal repository, but feedback, corrections, and suggestions are warmly welcome. If you spot an error or have a suggestion for improving the notes, feel free to open an issue.
 
 ---
 
-## 📄 License
+## License
 
 This repository is shared for educational purposes. Please credit appropriately if you reuse or adapt any of the materials.
 
