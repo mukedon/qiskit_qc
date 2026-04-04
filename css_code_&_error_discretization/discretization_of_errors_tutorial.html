@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discretization of Quantum Errors — 9-Qubit Shor Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['boldsymbol', 'braket']},
+    tags: 'ams',
+    macros: {
+      ket: ['\\left|{#1}\\right\\rangle', 1],
+      bra: ['\\left\\langle{#1}\\right|', 1],
+      braket: ['\\left\\langle{#1}\\middle|{#2}\\right\\rangle', 2],
+      op: ['\\hat{#1}', 1]
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+:root {
+  --bg:        #0b0e14;
+  --bg2:       #111520;
+  --bg3:       #161c2b;
+  --border:    #1e2840;
+  --border2:   #2a3658;
+  --text:      #d4d8e8;
+  --text-dim:  #7a84a0;
+  --accent:    #5d9cf5;
+  --accent2:   #a78bfa;
+  --accent3:   #34d399;
+  --accent4:   #f97316;
+  --red:       #f87171;
+  --yellow:    #fbbf24;
+  --code-bg:   #0d1117;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  padding: 60px 40px 50px;
+  border-bottom: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(93,156,245,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 60%, rgba(167,139,250,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-series {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-series::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--accent);
+}
+.hero h1 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(28px, 4.5vw, 52px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #e8eaf6;
+  max-width: 700px;
+  margin-bottom: 16px;
+}
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub {
+  font-size: 16px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 28px;
+}
+.badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 3px;
+  border: 1px solid;
+  letter-spacing: 0.05em;
+}
+.badge-blue   { color: var(--accent);  border-color: rgba(93,156,245,0.35);  background: rgba(93,156,245,0.06); }
+.badge-purple { color: var(--accent2); border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.06); }
+.badge-green  { color: var(--accent3); border-color: rgba(52,211,153,0.35);  background: rgba(52,211,153,0.06); }
+.badge-orange { color: var(--accent4); border-color: rgba(249,115,22,0.35);  background: rgba(249,115,22,0.06); }
+
+/* ── LAYOUT ── */
+.container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+/* ── TOC ── */
+.toc {
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  border-radius: 6px;
+  padding: 28px 32px;
+  margin: 48px 0 0;
+}
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.toc ol { list-style: none; counter-reset: toc; }
+.toc li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.toc li:last-child { border-bottom: none; }
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  min-width: 24px;
+}
+.toc a { color: var(--text); text-decoration: none; font-size: 16px; transition: color 0.2s; }
+.toc a:hover { color: var(--accent); }
+
+/* ── SECTIONS ── */
+section {
+  padding: 60px 0 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+section:first-of-type { border-top: none; }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+  max-width: 60px;
+}
+h2 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 700;
+  color: #e0e4f2;
+  margin-bottom: 24px;
+  line-height: 1.25;
+}
+h3 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 19px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent2);
+  margin: 36px 0 14px;
+}
+h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent3);
+  margin: 28px 0 10px;
+}
+p { margin-bottom: 18px; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border-left: 3px solid;
+  padding: 16px 22px;
+  border-radius: 0 6px 6px 0;
+  margin: 28px 0;
+  font-size: 17px;
+}
+.callout-idea   { border-color: var(--accent);  background: rgba(93,156,245,0.06); }
+.callout-math   { border-color: var(--accent2); background: rgba(167,139,250,0.06); }
+.callout-warn   { border-color: var(--yellow);  background: rgba(251,191,36,0.06); }
+.callout-result { border-color: var(--accent3); background: rgba(52,211,153,0.06); }
+.callout-bug    { border-color: var(--red);     background: rgba(248,113,113,0.06); }
+.callout-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.callout-idea   .callout-title { color: var(--accent);  }
+.callout-math   .callout-title { color: var(--accent2); }
+.callout-warn   .callout-title { color: var(--yellow);  }
+.callout-result .callout-title { color: var(--accent3); }
+.callout-bug    .callout-title { color: var(--red);     }
+
+/* ── CODE BLOCKS ── */
+.code-wrapper {
+  margin: 24px 0;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background: #0d1117;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dots span { width: 9px; height: 9px; border-radius: 50%; }
+.code-dots span:nth-child(1) { background: #ff5f57; }
+.code-dots span:nth-child(2) { background: #febc2e; }
+.code-dots span:nth-child(3) { background: #28c840; }
+pre {
+  background: var(--code-bg);
+  padding: 20px 24px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+code { font-family: 'JetBrains Mono', monospace; }
+
+/* syntax highlighting */
+.kw   { color: #c678dd; }
+.fn   { color: #61afef; }
+.str  { color: #98c379; }
+.num  { color: #d19a66; }
+.cm   { color: #5c6370; font-style: italic; }
+.cls  { color: #e5c07b; }
+.op   { color: #56b6c2; }
+.var  { color: #e06c75; }
+.paren{ color: var(--text-dim); }
+
+/* ── MATH BLOCKS ── */
+.math-block {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 20px 28px;
+  margin: 20px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.math-block.labeled {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  text-align: left;
+}
+.math-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  padding-left: 16px;
+}
+
+/* ── STEP LIST ── */
+.steps { list-style: none; counter-reset: step; margin: 20px 0; }
+.steps li {
+  counter-increment: step;
+  padding: 12px 0 12px 48px;
+  position: relative;
+  border-bottom: 1px dashed var(--border);
+}
+.steps li:last-child { border-bottom: none; }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 13px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(93,156,245,0.12);
+  border: 1px solid rgba(93,156,245,0.3);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── INLINE CODE ── */
+.ic {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: rgba(93,156,245,0.1);
+  border: 1px solid rgba(93,156,245,0.2);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: var(--accent);
+}
+
+/* ── STABILIZER TABLE ── */
+.stab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin: 20px 0;
+}
+.stab-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
+}
+.stab-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.stab-table tr:last-child td { border-bottom: none; }
+.stab-table tr:hover td { background: rgba(255,255,255,0.02); }
+.tag-z { color: #f87171; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.tag-x { color: #60a5fa; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.tag-l { color: var(--accent3); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+/* ── SEPARATOR ── */
+.sep {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0;
+  color: var(--border2);
+}
+.sep::before, .sep::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.sep span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: var(--border2);
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 32px;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  margin-top: 60px;
+}
+footer .series-nav {
+  display: flex;
+  justify-content: space-between;
+  max-width: 860px;
+  margin: 0 auto 24px;
+  font-size: 12px;
+}
+footer .series-nav a { color: var(--accent); text-decoration: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .hero { padding: 40px 20px 36px; }
+  .container { padding: 0 20px; }
+  pre { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<div class="hero">
+  <div style="max-width:860px; margin:0 auto;">
+    <div class="hero-series">CSS Codes &nbsp;·&nbsp; Tutorial II of III</div>
+    <h1><em>Discretization</em> of Quantum Errors<br>via the Shor Code</h1>
+    <p class="hero-sub">how continuous errors collapse to Pauli errors under syndrome measurement</p>
+    <div class="badge-row">
+      <span class="badge badge-blue">9-qubit Shor code</span>
+      <span class="badge badge-purple">Pauli decomposition</span>
+      <span class="badge badge-green">Syndrome measurement</span>
+      <span class="badge badge-orange">Qiskit · Python</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ─── TOC ─── -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><a href="#pauli-basis">The Pauli Basis — Every Error Lives Here</a></li>
+    <li><a href="#continuous-vs-discrete">Continuous vs. Discrete Errors</a></li>
+    <li><a href="#pauli-strings">Pauli Strings and the Qiskit Convention</a></li>
+    <li><a href="#shor-encoding">Encoding a Logical Qubit with the Shor Code</a></li>
+    <li><a href="#applying-error">Applying a Continuous (Unitary) Error</a></li>
+    <li><a href="#syndrome">Syndrome Measurement and the Collapse</a></li>
+    <li><a href="#discretization">The Discretization Theorem — Full Derivation</a></li>
+    <li><a href="#non-unitary">Beyond Unitaries: Arbitrary Qubit Channels</a></li>
+    <li><a href="#demo">Full Demo: Putting It All Together</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════ §1 PAULI BASIS ═══════════════════════ -->
+<section id="pauli-basis">
+  <div class="section-label">Section 01</div>
+  <h2>The Pauli Basis — Every Error Lives Here</h2>
+
+  <p>
+    Before we can talk about discretizing errors, we need a language to describe single-qubit
+    operators. The four <strong>Pauli matrices</strong> — including the identity — form a
+    complete basis for the space of $2\times 2$ complex matrices:
+  </p>
+
+  <div class="math-block">
+    $$
+    \mathbb{I} = \begin{pmatrix}1&0\\0&1\end{pmatrix}, \quad
+    X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \quad
+    Y = \begin{pmatrix}0&-i\\i&0\end{pmatrix}, \quad
+    Z = \begin{pmatrix}1&0\\0&-1\end{pmatrix}.
+    $$
+  </div>
+
+  <p>
+    This is not merely a convenient choice. It is a theorem: <em>any</em> $2\times 2$ complex
+    matrix $M$ can be uniquely written as
+  </p>
+
+  <div class="math-block labeled">
+    <div>$$M = \alpha\,\mathbb{I} + \beta\,X + \gamma\,Y + \delta\,Z, \qquad \alpha,\beta,\gamma,\delta\in\mathbb{C}.$$</div>
+    <div class="math-label">(Pauli expansion)</div>
+  </div>
+
+  <p>
+    In particular, every error — whether it is a tiny accidental rotation, a full bit-flip,
+    or a strange channel we have never encountered before — is a matrix, and therefore has
+    a Pauli expansion. The three key Pauli errors have immediate physical interpretations:
+  </p>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:16px; margin:28px 0;">
+    <div style="border:1px solid var(--border2); border-left:3px solid var(--red); border-radius:0 6px 6px 0; padding:18px 20px; background:var(--bg2);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--red);margin-bottom:8px;">Bit-flip — X</div>
+      <p style="margin:0;font-size:16px;">Flips $|0\rangle \leftrightarrow |1\rangle$. The quantum analogue of a classical bit error.</p>
+    </div>
+    <div style="border:1px solid var(--border2); border-left:3px solid var(--accent); border-radius:0 6px 6px 0; padding:18px 20px; background:var(--bg2);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:8px;">Phase-flip — Z</div>
+      <p style="margin:0;font-size:16px;">Flips the relative phase: $|0\rangle\mapsto|0\rangle$, $|1\rangle\mapsto-|1\rangle$. Has no classical analogue.</p>
+    </div>
+    <div style="border:1px solid var(--border2); border-left:3px solid var(--accent2); border-radius:0 6px 6px 0; padding:18px 20px; background:var(--bg2);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent2);margin-bottom:8px;">Combined — Y = iXZ</div>
+      <p style="margin:0;font-size:16px;">Both a bit-flip and a phase-flip simultaneously. Note the useful identity $Y = iXZ$.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-math">
+    <div class="callout-title">Key identity</div>
+    <p style="margin:0;">
+      The relation $Y = iXZ$ will be crucial later. It means any $Y$ error can be decomposed
+      into an $X$ error followed by a $Z$ error (up to a global phase), so correcting $X$ and
+      $Z$ errors separately is sufficient to correct $Y$ errors as well.
+    </p>
+  </div>
+
+  <h3>Unitarity constraint on the coefficients</h3>
+
+  <p>
+    If $U$ is a <em>unitary</em> matrix (i.e. $U^\dagger U = \mathbb{I}$), then its Pauli
+    coefficients $\alpha,\beta,\gamma,\delta$ must satisfy
+  </p>
+
+  <div class="math-block">
+    $$|\alpha|^2 + |\beta|^2 + |\gamma|^2 + |\delta|^2 = 1.$$
+  </div>
+
+  <p>
+    This looks exactly like a normalisation condition on a 4-component complex vector.
+    The probabilities $|\alpha|^2, |\beta|^2, |\gamma|^2, |\delta|^2$ will turn out to be
+    exactly the probabilities with which the state collapses to each Pauli-error subspace
+    during syndrome measurement. This is the heart of discretization.
+  </p>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">Caution — not every normalised vector gives a unitary</div>
+    <p style="margin:0;">
+      The condition $\sum|\cdot|^2 = 1$ is <em>necessary</em> but not <em>sufficient</em>
+      for $U$ to be unitary. Generating four random complex numbers and normalising their
+      $\ell^2$ norm does <strong>not</strong> generally yield a unitary. For a proper random
+      unitary one should use Qiskit's <span class="ic">random_unitary</span> from
+      <span class="ic">qiskit.quantum_info</span>, or the Haar measure. In our code below
+      we use the normalised random approach as a convenient way to produce a generic
+      (non-unitary) single-qubit error channel that still illustrates discretization.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §2 CONTINUOUS VS DISCRETE ═══════════════════════ -->
+<section id="continuous-vs-discrete">
+  <div class="section-label">Section 02</div>
+  <h2>Continuous vs. Discrete Errors</h2>
+
+  <p>
+    A central challenge in quantum error correction is that real physical noise is
+    <em>continuous</em>. A qubit coupling to its environment, a miscalibrated gate, or a
+    stray electromagnetic field will apply some operator $U$ that is not one of the four
+    Pauli operators — it might be an infinitesimally small rotation like
+    $U = e^{i\epsilon Z} = \cos\epsilon\,\mathbb{I} + i\sin\epsilon\, Z$.
+  </p>
+
+  <p>
+    At first glance this is catastrophic: there are uncountably many possible errors, so it
+    seems impossible to identify and undo each one exactly. But the Shor code (and quantum
+    error correction in general) sidesteps this problem entirely through a remarkable mechanism.
+  </p>
+
+  <div class="callout callout-idea">
+    <div class="callout-title">The core insight</div>
+    <p style="margin:0;">
+      After the encoded state interacts with an arbitrary single-qubit error channel, running
+      the syndrome measurement circuit <strong>collapses</strong> ("projects") the error into
+      exactly one of four discrete outcomes: no error $(\mathbb{I})$, bit-flip $(X)$,
+      phase-flip $(Z)$, or combined $(Y = iXZ)$. The code never needs to know or undo the
+      continuous error directly — the measurement does the discretization for free.
+    </p>
+  </div>
+
+  <p>
+    This is why the Shor code can correct <em>arbitrary</em> single-qubit errors, not just
+    the three Pauli errors. In the following sections we will derive this result step by step
+    and verify it in simulation.
+  </p>
+
+</section>
+
+<!-- ═══════════════════════ §3 PAULI STRINGS ═══════════════════════ -->
+<section id="pauli-strings">
+  <div class="section-label">Section 03</div>
+  <h2>Pauli Strings and the Qiskit Convention</h2>
+
+  <p>
+    For a multi-qubit system we build operators by taking <strong>tensor products</strong> of
+    single-qubit Pauli operators. A <em>Pauli string</em> is such a tensor product; for the
+    9-qubit Shor code, a Pauli string acts on all nine qubits simultaneously:
+  </p>
+
+  <div class="math-block">
+    $$P = P_8 \otimes P_7 \otimes \cdots \otimes P_1 \otimes P_0, \qquad P_i \in \{\mathbb{I}, X, Y, Z\}.$$
+  </div>
+
+  <h3>Little-endian ordering in Qiskit</h3>
+
+  <p>
+    Qiskit uses <strong>little-endian</strong> (right-to-left) qubit ordering in Pauli strings.
+    In a string like <span class="ic">"ABCDEFGHI"</span>, the <em>rightmost</em> character
+    acts on qubit $Q_0$ and the <em>leftmost</em> acts on qubit $Q_8$:
+  </p>
+
+  <div class="math-block">
+    $$\underbrace{A}_{Q_8}\;\underbrace{B}_{Q_7}\;\underbrace{C}_{Q_6}\;\underbrace{D}_{Q_5}\;\underbrace{E}_{Q_4}\;\underbrace{F}_{Q_3}\;\underbrace{G}_{Q_2}\;\underbrace{H}_{Q_1}\;\underbrace{I}_{Q_0}$$
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">A common source of bugs — stabilizer string ordering</div>
+    <p style="margin-bottom:8px;">
+      Because of this convention, the stabilizer $Z_0 Z_1$ (acting on the first two
+      physical qubits of block 1) must be written as <span class="ic">"IIIIIIIZZ"</span>,
+      <em>not</em> <span class="ic">"ZZIIIIIII"</span>.
+    </p>
+    <p style="margin:0;">
+      The string <span class="ic">"ZZIIIIIII"</span> actually encodes $Z_8 Z_7$, acting on
+      block 3. This is a silent bug: the code runs without errors but measures the wrong
+      stabilizer. Both source notebooks contained this mistake.
+    </p>
+  </div>
+
+  <table class="stab-table">
+    <thead>
+      <tr>
+        <th>Stabilizer</th>
+        <th>Mathematical form</th>
+        <th>Correct Qiskit string</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>$g_1$</td><td>$Z_0 Z_1$</td><td class="tag-z">IIIIIIIZZ</td><td>bit-flip check, block 1</td></tr>
+      <tr><td>$g_2$</td><td>$Z_1 Z_2$</td><td class="tag-z">IIIIIIZZI</td><td>bit-flip check, block 1</td></tr>
+      <tr><td>$g_3$</td><td>$Z_3 Z_4$</td><td class="tag-z">IIIIIZZII</td><td>bit-flip check, block 2</td></tr>
+      <tr><td>$g_4$</td><td>$Z_4 Z_5$</td><td class="tag-z">IIIIZZIII</td><td>bit-flip check, block 2</td></tr>
+      <tr><td>$g_5$</td><td>$Z_6 Z_7$</td><td class="tag-z">IZZIIIII</td><td>bit-flip check, block 3</td></tr>
+      <tr><td>$g_6$</td><td>$Z_7 Z_8$</td><td class="tag-z">ZZIIIIII</td><td>bit-flip check, block 3</td></tr>
+      <tr><td>$g_7$</td><td>$X_0 X_1 X_2 X_3 X_4 X_5$</td><td class="tag-x">IIIXXXXXX</td><td>phase-flip check, blocks 1–2</td></tr>
+      <tr><td>$g_8$</td><td>$X_3 X_4 X_5 X_6 X_7 X_8$</td><td class="tag-x">XXXXXXIII</td><td>phase-flip check, blocks 2–3</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    The two source notebooks also contained a bug in how the <em>n-qubit error operator</em>
+    was constructed via tensor products. When looping
+    <span class="ic">for i in range(n)</span> and accumulating with
+    <span class="ic">op = op.tensor(single)</span>, the error ends up on qubit
+    $n-1-k$ instead of qubit $k$. The fix is to swap the order:
+    <span class="ic">op = single.tensor(op)</span>. Both notebooks have been corrected below.
+  </p>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Imports and Pauli string checker</div>
+    </div>
+    <pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">random</span>
+<span class="kw">from</span> <span class="var">qiskit</span> <span class="kw">import</span> <span class="cls">QuantumCircuit</span>
+<span class="kw">from</span> <span class="var">qiskit.quantum_info</span> <span class="kw">import</span> <span class="cls">Statevector</span>, <span class="cls">SparsePauliOp</span>
+
+<span class="cm"># ── Pauli string checker ────────────────────────────────────────────────────</span>
+<span class="cm"># Checks a Pauli string (big-endian notation, e.g. 'IXYZ') and reports</span>
+<span class="cm"># which qubits carry non-identity operations in Qiskit's little-endian order.</span>
+<span class="kw">def</span> <span class="fn">check_pauli_string</span><span class="paren">(</span><span class="var">error_string</span><span class="paren">)</span>:
+    <span class="var">valid_paulis</span> <span class="op">=</span> <span class="paren">{</span><span class="str">'I'</span>, <span class="str">'X'</span>, <span class="str">'Y'</span>, <span class="str">'Z'</span><span class="paren">}</span>
+    <span class="var">n</span> <span class="op">=</span> <span class="fn">len</span><span class="paren">(</span><span class="var">error_string</span><span class="paren">)</span>
+    <span class="kw">for</span> <span class="var">char</span> <span class="kw">in</span> <span class="var">error_string</span>:
+        <span class="kw">if</span> <span class="var">char</span> <span class="kw">not in</span> <span class="var">valid_paulis</span>:
+            <span class="kw">raise</span> <span class="cls">ValueError</span><span class="paren">(</span><span class="str">"Invalid character in Pauli string."</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"Pauli string (big-endian): {error_string}"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">"─" * 50</span><span class="paren">)</span>
+    <span class="var">found</span> <span class="op">=</span> <span class="kw">False</span>
+    <span class="kw">for</span> <span class="var">i</span>, <span class="var">op</span> <span class="kw">in</span> <span class="fn">enumerate</span><span class="paren">(</span><span class="var">error_string</span><span class="paren">)</span>:
+        <span class="kw">if</span> <span class="var">op</span> <span class="op">!=</span> <span class="str">'I'</span>:
+            <span class="var">q_idx</span> <span class="op">=</span> <span class="var">n</span> <span class="op">-</span> <span class="num">1</span> <span class="op">-</span> <span class="var">i</span>  <span class="cm"># big-endian → Qiskit little-endian</span>
+            <span class="fn">print</span><span class="paren">(</span><span class="str">f"  Q_{q_idx} ← {op}"</span><span class="paren">)</span>
+            <span class="var">found</span> <span class="op">=</span> <span class="kw">True</span>
+    <span class="kw">if not</span> <span class="var">found</span>:
+        <span class="fn">print</span><span class="paren">(</span><span class="str">"  No errors — all qubits are identity."</span><span class="paren">)</span>
+
+<span class="cm"># ── Generate a random Pauli string ──────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">random_pauli_string</span><span class="paren">(</span><span class="var">n_qubits</span><span class="paren">)</span>:
+    <span class="kw">return</span> <span class="str">''</span>.<span class="fn">join</span><span class="paren">(</span><span class="var">random</span>.<span class="fn">choice</span><span class="paren">([</span><span class="str">'I'</span>,<span class="str">'X'</span>,<span class="str">'Y'</span>,<span class="str">'Z'</span><span class="paren">])</span> <span class="kw">for</span> <span class="var">_</span> <span class="kw">in</span> <span class="fn">range</span><span class="paren">(</span><span class="var">n_qubits</span><span class="paren">))</span>
+
+<span class="cm"># Try it:</span>
+<span class="var">s</span> <span class="op">=</span> <span class="fn">random_pauli_string</span><span class="paren">(</span><span class="num">9</span><span class="paren">)</span>
+<span class="fn">check_pauli_string</span><span class="paren">(</span><span class="var">s</span><span class="paren">)</span></pre>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §4 ENCODING ═══════════════════════ -->
+<section id="shor-encoding">
+  <div class="section-label">Section 04</div>
+  <h2>Encoding a Logical Qubit with the Shor Code</h2>
+
+  <p>
+    The 9-qubit Shor code encodes one logical qubit into 9 physical qubits via a two-layer
+    construction: an <em>outer</em> phase-flip repetition code over three blocks, and an
+    <em>inner</em> bit-flip repetition code within each block.
+  </p>
+
+  <h3>Logical codewords</h3>
+
+  <div class="math-block">
+    $$
+    |0_L\rangle = \frac{1}{2\sqrt{2}}\bigl(|000\rangle+|111\rangle\bigr)^{\otimes 3}
+    \qquad
+    |1_L\rangle = \frac{1}{2\sqrt{2}}\bigl(|000\rangle-|111\rangle\bigr)^{\otimes 3}
+    $$
+  </div>
+
+  <p>
+    A general logical state $|\psi_L\rangle = a\,|0_L\rangle + b\,|1_L\rangle$ is the
+    input to the encoding circuit. Note: do <strong>not</strong> confuse the logical
+    amplitudes $a, b$ with the error coefficients $\alpha,\beta,\gamma,\delta$ introduced
+    later.
+  </p>
+
+  <h3>Encoding circuit (Qiskit, little-endian)</h3>
+
+  <p>
+    The encoding proceeds in three stages. The circuit below encodes $|0_L\rangle$ (starting
+    from $|0\rangle^{\otimes 9}$ with qubit $Q_0$ as the logical input).
+  </p>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Shor encoding circuit</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">shor_encode</span><span class="paren">()</span>:
+    <span class="var">qc</span> <span class="op">=</span> <span class="cls">QuantumCircuit</span><span class="paren">(</span><span class="num">9</span><span class="paren">)</span>
+
+    <span class="cm"># Step 1 — outer repetition: spread logical qubit across three blocks</span>
+    <span class="cm">#          Q0 is the logical qubit; Q3 and Q6 become block anchors.</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>, <span class="num">3</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>, <span class="num">6</span><span class="paren">)</span>
+
+    <span class="cm"># Step 2 — Hadamard on each block anchor: converts Z-basis to X-basis</span>
+    <span class="cm">#          so that bit-flip protection works in the Hadamard (phase) basis.</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">([</span><span class="num">0</span>, <span class="num">3</span>, <span class="num">6</span><span class="paren">])</span>
+
+    <span class="cm"># Step 3 — inner repetition within each block</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>, <span class="num">1</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>, <span class="num">2</span><span class="paren">)</span>   <span class="cm"># block 1: Q0, Q1, Q2</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">3</span>, <span class="num">4</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">3</span>, <span class="num">5</span><span class="paren">)</span>   <span class="cm"># block 2: Q3, Q4, Q5</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">6</span>, <span class="num">7</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">6</span>, <span class="num">8</span><span class="paren">)</span>   <span class="cm"># block 3: Q6, Q7, Q8</span>
+
+    <span class="kw">return</span> <span class="var">qc</span>
+
+<span class="var">circuit</span> <span class="op">=</span> <span class="fn">shor_encode</span><span class="paren">()</span>
+<span class="var">circuit</span>.<span class="fn">draw</span><span class="paren">()</span></pre>
+  </div>
+
+  <p>The circuit diagram should render as:</p>
+
+<div style="background:var(--bg2); border:1px solid var(--border2); border-radius:6px; padding:20px 24px; margin:20px 0; overflow-x:auto;">
+<pre style="
+    background:transparent;
+    padding:0;
+    font-size:12px;
+    line-height:1.4;
+    color:var(--text-dim);
+    font-family: monospace;
+    white-space: pre;
+    margin:0;
+">
+               ┌───┐
+q_0: ──■────■──┤ H ├──■────■──
+       │    │  └───┘┌─┴─┐  │
+q_1: ──┼────┼───────┤ X ├──┼──
+       │    │       └───┘┌─┴─┐
+q_2: ──┼────┼────────────┤ X ├
+     ┌─┴─┐  │  ┌───┐     └───┘
+q_3: ┤ X ├──┼──┤ H ├──■────■──
+     └───┘  │  └───┘┌─┴─┐  │
+q_4: ───────┼───────┤ X ├──┼──
+            │       └───┘┌─┴─┐
+q_5: ───────┼────────────┤ X ├
+          ┌─┴─┐┌───┐     └───┘
+q_6: ─────┤ X ├┤ H ├──■────■──
+          └───┘└───┘┌─┴─┐  │
+q_7: ───────────────┤ X ├──┼──
+                    └───┘┌─┴─┐
+q_8: ────────────────────┤ X ├
+                         └───┘
+</pre>
+</div>
+
+</section>
+
+<!-- ═══════════════════════ §5 APPLYING ERROR ═══════════════════════ -->
+<section id="applying-error">
+  <div class="section-label">Section 05</div>
+  <h2>Applying a Continuous (Unitary) Error</h2>
+
+  <p>
+    We now model a generic single-qubit error as an operator that acts on one qubit $Q_k$
+    while leaving all others untouched:
+  </p>
+
+  <div class="math-block labeled">
+    <div>$$U_k = \alpha\,\mathbb{I}_k + \beta\,X_k + \gamma\,Y_k + \delta\,Z_k$$</div>
+    <div class="math-label">(single-qubit error on $Q_k$)</div>
+  </div>
+
+  <p>
+    To act on the full 9-qubit state we must <strong>tensor-embed</strong> $U$ into the
+    9-qubit Hilbert space:
+  </p>
+
+  <div class="math-block">
+    $$U_k = \underbrace{\mathbb{I} \otimes \cdots \otimes \mathbb{I}}_{n-1-k} \otimes\; U\; \otimes \underbrace{\mathbb{I} \otimes \cdots \otimes \mathbb{I}}_{k}$$
+  </div>
+
+  <p>
+    Because of Qiskit's little-endian convention, there is a subtle but critical ordering
+    issue when building this operator programmatically. The correct accumulation uses
+    <span class="ic">single.tensor(op)</span> (not <span class="ic">op.tensor(single)</span>):
+  </p>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Continuous error operator (corrected)</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">random_pauli_unitary</span><span class="paren">()</span>:
+    <span class="cm">"""Return a SparsePauliOp of the form αI + βX + γY + δZ with a random,
+    normalised coefficient vector.  Note: this is NOT guaranteed to be
+    unitary — it is used here as a generic single-qubit error operator."""</span>
+    <span class="var">coeffs</span> <span class="op">=</span> <span class="var">np</span>.<span class="var">random</span>.<span class="fn">randn</span><span class="paren">(</span><span class="num">4</span><span class="paren">)</span> <span class="op">+</span> <span class="num">1j</span> <span class="op">*</span> <span class="var">np</span>.<span class="var">random</span>.<span class="fn">randn</span><span class="paren">(</span><span class="num">4</span><span class="paren">)</span>
+    <span class="var">coeffs</span> <span class="op">/=</span> <span class="var">np</span>.<span class="var">linalg</span>.<span class="fn">norm</span><span class="paren">(</span><span class="var">coeffs</span><span class="paren">)</span>          <span class="cm"># ensures Σ|.|² = 1</span>
+    <span class="kw">return</span> <span class="cls">SparsePauliOp</span><span class="paren">([</span><span class="str">'I'</span>, <span class="str">'X'</span>, <span class="str">'Y'</span>, <span class="str">'Z'</span><span class="paren">]</span>, <span class="var">coeffs</span><span class="paren">)</span>, <span class="var">coeffs</span>
+
+<span class="kw">def</span> <span class="fn">apply_error</span><span class="paren">(</span><span class="var">state</span>, <span class="var">coeffs</span>, <span class="var">target_qubit</span>, <span class="var">n</span><span class="op">=</span><span class="num">9</span><span class="paren">)</span>:
+    <span class="cm">"""Embed the single-qubit error U = αI + βX + γY + δZ on qubit target_qubit
+    into the full n-qubit Hilbert space and apply it to state.
+
+    Bug fixed: the original code used op.tensor(single) which placed the error
+    on qubit (n-1-target_qubit) instead of target_qubit.  The correct
+    accumulation is single.tensor(op)."""</span>
+    <span class="var">op</span> <span class="op">=</span> <span class="kw">None</span>
+    <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="paren">(</span><span class="var">n</span><span class="paren">)</span>:
+        <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="var">target_qubit</span>:
+            <span class="var">single</span> <span class="op">=</span> <span class="cls">SparsePauliOp</span><span class="paren">([</span><span class="str">'I'</span>, <span class="str">'X'</span>, <span class="str">'Y'</span>, <span class="str">'Z'</span><span class="paren">]</span>, <span class="var">coeffs</span><span class="paren">)</span>
+        <span class="kw">else</span>:
+            <span class="var">single</span> <span class="op">=</span> <span class="cls">SparsePauliOp</span><span class="paren">(</span><span class="str">'I'</span><span class="paren">)</span>
+        <span class="cm"># FIX: single.tensor(op)  ← 'single' acts on higher-indexed qubits</span>
+        <span class="cm">#      NOT op.tensor(single) which reverses the qubit assignment!</span>
+        <span class="var">op</span> <span class="op">=</span> <span class="var">single</span> <span class="kw">if</span> <span class="var">op</span> <span class="kw">is</span> <span class="kw">None</span> <span class="kw">else</span> <span class="var">single</span>.<span class="fn">tensor</span><span class="paren">(</span><span class="var">op</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">state</span>.<span class="fn">evolve</span><span class="paren">(</span><span class="var">op</span><span class="paren">)</span>
+
+<span class="cm"># ── Example: apply a random error to qubit Q2 (block 1) ─────────────────────</span>
+<span class="var">U</span>, <span class="var">coeffs</span> <span class="op">=</span> <span class="fn">random_pauli_unitary</span><span class="paren">()</span>
+<span class="fn">print</span><span class="paren">(</span><span class="str">"Error operator U =", U</span><span class="paren">)</span>
+<span class="fn">print</span><span class="paren">(</span><span class="str">f"\nCoefficients α,β,γ,δ = {coeffs}"</span><span class="paren">)</span>
+<span class="fn">print</span><span class="paren">(</span><span class="str">f"Sum |.|² = {np.sum(np.abs(coeffs)**2):.6f}  (should be 1)"</span><span class="paren">)</span>
+
+<span class="cm"># Encode logical |0⟩</span>
+<span class="var">qc</span>     <span class="op">=</span> <span class="fn">shor_encode</span><span class="paren">()</span>
+<span class="var">state</span>  <span class="op">=</span> <span class="cls">Statevector</span>.<span class="fn">from_instruction</span><span class="paren">(</span><span class="var">qc</span><span class="paren">)</span>
+
+<span class="cm"># Apply the error on Q2 (last qubit of block 1)</span>
+<span class="var">errored_state</span> <span class="op">=</span> <span class="fn">apply_error</span><span class="paren">(</span><span class="var">state</span>, <span class="var">coeffs</span>, <span class="var">target_qubit</span><span class="op">=</span><span class="num">2</span><span class="paren">)</span>
+<span class="fn">print</span><span class="paren">(</span><span class="str">"\nError applied to Q2.  State is now a superposition of error sectors."</span><span class="paren">)</span></pre>
+  </div>
+
+  <p>
+    After this step the 9-qubit system is in the state
+  </p>
+
+  <div class="math-block">
+    $$U_2 |\psi\rangle = \alpha|\psi\rangle + \beta X_2|\psi\rangle + \gamma Y_2|\psi\rangle + \delta Z_2|\psi\rangle.$$
+  </div>
+
+  <p>
+    This is a <em>superposition of four distinct error scenarios</em>. No measurement has
+    been performed yet, so the error is still continuous — all four Pauli components are
+    simultaneously present. The magic happens in the next step.
+  </p>
+
+</section>
+
+<!-- ═══════════════════════ §6 SYNDROME ═══════════════════════ -->
+<section id="syndrome">
+  <div class="section-label">Section 06</div>
+  <h2>Syndrome Measurement and the Collapse</h2>
+
+  <p>
+    The Shor code's 8 stabilizer generators each have eigenvalues $\pm 1$. Measuring one
+    of them on the errored state produces a classical bit: $+1$ (no anticommutation) or
+    $-1$ (anticommutation detected). Collectively the 8 syndrome bits identify which qubit
+    was affected and which Pauli error occurred.
+  </p>
+
+  <p>
+    We compute the syndrome in two equivalent ways:
+  </p>
+
+  <ul style="margin:0 0 18px 24px; line-height:2;">
+    <li><strong>Expectation value</strong>: $\langle \psi' | S | \psi' \rangle \in [-1, +1]$ — gives a continuous indication of how much the stabilizer has been violated. Useful for visualising the effect of partial errors.</li>
+    <li><strong>Projective measurement</strong>: samples $\pm 1$ with probabilities $(1 \pm \langle S\rangle)/2$ and <em>collapses</em> the state into the corresponding eigenspace. This is what a real quantum device does.</li>
+  </ul>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Syndrome measurement (two modes)</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">measure_stabilizer_expectation</span><span class="paren">(</span><span class="var">state</span>, <span class="var">pauli_string</span><span class="paren">)</span>:
+    <span class="cm">"""Return the real expectation value ⟨S⟩ ∈ [-1, +1].
+    +1 → stabilizer satisfied (no error of this type)
+    -1 → stabilizer violated (error detected)"""</span>
+    <span class="var">op</span> <span class="op">=</span> <span class="cls">SparsePauliOp</span><span class="paren">(</span><span class="var">pauli_string</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">state</span>.<span class="fn">expectation_value</span><span class="paren">(</span><span class="var">op</span><span class="paren">)</span>.<span class="var">real</span>
+
+<span class="kw">def</span> <span class="fn">measure_stabilizer</span><span class="paren">(</span><span class="var">state</span>, <span class="var">pauli_string</span><span class="paren">)</span>:
+    <span class="cm">"""Simulate a projective measurement of the stabilizer.
+    Returns +1 or -1, sampled from the Born-rule distribution."""</span>
+    <span class="var">val</span> <span class="op">=</span> <span class="fn">measure_stabilizer_expectation</span><span class="paren">(</span><span class="var">state</span>, <span class="var">pauli_string</span><span class="paren">)</span>
+    <span class="var">p_plus</span> <span class="op">=</span> <span class="paren">(</span><span class="num">1</span> <span class="op">+</span> <span class="var">val</span><span class="paren">)</span> <span class="op">/</span> <span class="num">2</span>
+    <span class="kw">return</span> <span class="var">np</span>.<span class="var">random</span>.<span class="fn">choice</span><span class="paren">([</span><span class="op">+</span><span class="num">1</span>, <span class="op">-</span><span class="num">1</span><span class="paren">]</span>, <span class="var">p</span><span class="op">=</span><span class="paren">[</span><span class="var">p_plus</span>, <span class="num">1</span> <span class="op">-</span> <span class="var">p_plus</span><span class="paren">])</span>
+
+<span class="cm"># ── Read the syndrome for an error on Q2 ──────────────────────────────────
+# Corrected Qiskit strings (rightmost char = Q0):
+# g1 = Z0Z1 → "IIIIIIIZZ"    g2 = Z1Z2 → "IIIIIIZZI"
+# g7 = X0…X5 → "IIIXXXXXX"   g8 = X3…X8 → "XXXXXXIII"</span>
+
+<span class="var">stabs</span> <span class="op">=</span> <span class="paren">{</span>
+    <span class="str">"g1 (Z0Z1)"</span>  : <span class="str">"IIIIIIIZZ"</span>,
+    <span class="str">"g2 (Z1Z2)"</span>  : <span class="str">"IIIIIIZZI"</span>,
+    <span class="str">"g3 (Z3Z4)"</span>  : <span class="str">"IIIIIZZII"</span>,
+    <span class="str">"g4 (Z4Z5)"</span>  : <span class="str">"IIIIZZIII"</span>,
+    <span class="str">"g7 (X0-X5)"</span> : <span class="str">"IIIXXXXXX"</span>,
+    <span class="str">"g8 (X3-X8)"</span> : <span class="str">"XXXXXXIII"</span>,
+<span class="paren">}</span>
+
+<span class="fn">print</span><span class="paren">(</span><span class="str">"Syndrome (expectation values after error on Q2):"</span><span class="paren">)</span>
+<span class="kw">for</span> <span class="var">label</span>, <span class="var">s</span> <span class="kw">in</span> <span class="var">stabs</span>.<span class="fn">items</span><span class="paren">()</span>:
+    <span class="var">ev</span> <span class="op">=</span> <span class="fn">measure_stabilizer_expectation</span><span class="paren">(</span><span class="var">errored_state</span>, <span class="var">s</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"  {label:15s} → ⟨S⟩ = {ev:+.4f}"</span><span class="paren">)</span></pre>
+  </div>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Expected output — error on Q2</div>
+    <p style="margin:0; line-height:2; font-family:'JetBrains Mono',monospace; font-size:13px;">
+      g1 (Z0Z1)  → ⟨S⟩ = +1.0000 &nbsp; (no violation — error beyond g1's reach)<br>
+      g2 (Z1Z2)  → ⟨S⟩ = varies &nbsp; (depends on β component of error)<br>
+      g7 (X0-X5) → ⟨S⟩ = varies &nbsp; (depends on δ/γ component of error)<br>
+      g8 (X3-X8) → ⟨S⟩ = +1.0000 &nbsp; (Q2 not in support of g8)
+    </p>
+  </div>
+
+  <p>
+    Note that $g_1 = Z_0Z_1$ commutes with all Pauli operators on $Q_2$ because it acts
+    on different qubits, so it always returns $+1$. Similarly $g_8$ (which acts on
+    $Q_3,\ldots,Q_8$) commutes with any error on $Q_2$. The only stabilizers that can
+    detect a $Q_2$ error are $g_2$ (catches $X$) and $g_7$ (catches $Z$).
+  </p>
+
+</section>
+
+<!-- ═══════════════════════ §7 THEOREM ═══════════════════════ -->
+<section id="discretization">
+  <div class="section-label">Section 07</div>
+  <h2>The Discretization Theorem — Full Derivation</h2>
+
+  <p>
+    We now prove why measuring the syndrome collapses the continuous error to a discrete
+    Pauli, following the treatment in the IBM Quantum Learning course.
+  </p>
+
+  <h3>Step 1 — Error creates a superposition of Pauli sectors</h3>
+
+  <p>
+    Let $|\psi\rangle$ be the 9-qubit encoding of a logical state, and suppose qubit $Q_k$
+    undergoes the error $U$. Using $Y_k = iX_kZ_k$, we write:
+  </p>
+
+  <div class="math-block">
+    $$U_k|\psi\rangle = \alpha|\psi\rangle + \beta X_k|\psi\rangle + i\gamma X_kZ_k|\psi\rangle + \delta Z_k|\psi\rangle.$$
+  </div>
+
+  <p>
+    Each of the four terms lives in a <em>different eigenspace</em> of the stabilizer
+    generators:
+  </p>
+
+  <ul style="margin:0 0 18px 24px; line-height:2.2;">
+    <li>$|\psi\rangle$ is the +1 eigenstate of all stabilizers (no error).</li>
+    <li>$X_k|\psi\rangle$ anticommutes with any stabilizer $S$ for which $S$ contains a $Z$ on qubit $k$, flipping those stabilizer eigenvalues to $-1$.</li>
+    <li>$Z_k|\psi\rangle$ anticommutes with any stabilizer containing an $X$ on qubit $k$.</li>
+    <li>$X_kZ_k|\psi\rangle$ combines both effects.</li>
+  </ul>
+
+  <h3>Step 2 — The syndrome register becomes entangled with the error</h3>
+
+  <p>
+    The syndrome measurement circuit introduces 8 ancilla qubits. Just before the ancilla
+    measurements, the joint state of (ancillas $\otimes$ data) takes the form:
+  </p>
+
+  <div class="math-block">
+    $$
+    \alpha\,|\mathbb{I}\text{-synd}\rangle \otimes |\psi\rangle
+    + \beta\,|X_k\text{-synd}\rangle \otimes X_k|\psi\rangle
+    + i\gamma\,|X_kZ_k\text{-synd}\rangle \otimes X_kZ_k|\psi\rangle
+    + \delta\,|Z_k\text{-synd}\rangle \otimes Z_k|\psi\rangle
+    $$
+  </div>
+
+  <p>
+    where $|\mathbb{I}\text{-synd}\rangle$, $|X_k\text{-synd}\rangle$, etc. are distinct
+    8-qubit computational basis states determined by which stabilizers anticommute with
+    each error. Crucially, these four syndrome states are <strong>mutually orthogonal</strong>
+    because distinct errors produce distinct syndromes.
+  </p>
+
+  <h3>Step 3 — Measurement collapses to one sector</h3>
+
+  <p>
+    When we measure the 8 ancilla qubits, the joint state collapses to exactly one of
+    the four terms, with probabilities:
+  </p>
+
+  <div class="math-block">
+    $$
+    P(\mathbb{I}) = |\alpha|^2, \quad
+    P(X_k) = |\beta|^2, \quad
+    P(X_kZ_k) = |\gamma|^2, \quad
+    P(Z_k) = |\delta|^2.
+    $$
+  </div>
+
+  <p>
+    After measurement and classical correction (applying the appropriate Pauli inverse),
+    the data qubits are returned to $|\psi\rangle$ regardless of which outcome occurred.
+    The full post-correction state, expressed as a density matrix, is:
+  </p>
+
+  <div class="math-block">
+    $$\xi \otimes |\psi\rangle\langle\psi|,$$
+  </div>
+
+  <p>where $\xi$ describes the now-classical syndrome register and carries no information about the logical state. This is a product state — the syndrome and data are <strong>fully decoupled</strong>.</p>
+
+  <div class="callout callout-idea">
+    <div class="callout-title">Why this is remarkable</div>
+    <p style="margin-bottom:8px;">
+      The original continuous error $U = \alpha\mathbb{I}+\beta X+\gamma Y+\delta Z$ may have
+      had infinitely many possible forms. After the syndrome measurement, we only ever need to
+      correct one of <strong>four</strong> Pauli errors, and we know exactly which one from the
+      syndrome bits. The randomness generated by the error is absorbed into the ancilla qubits,
+      which can be reset and reused.
+    </p>
+    <p style="margin:0;">
+      This is why quantum error correction works: it is not that we reverse an arbitrary
+      continuous transformation. It is that the measurement itself <em>discretizes</em> the
+      error, and we only ever undo a discrete Pauli.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §8 NON-UNITARY ═══════════════════════ -->
+<section id="non-unitary">
+  <div class="section-label">Section 08</div>
+  <h2>Beyond Unitaries: Arbitrary Qubit Channels</h2>
+
+  <p>
+    So far we have considered unitary errors. Real noise is often <em>non-unitary</em>:
+    dephasing, depolarization, amplitude damping, reset errors. We model such noise with a
+    <strong>quantum channel</strong> $\Phi$, described by its Kraus decomposition:
+  </p>
+
+  <div class="math-block">
+    $$\Phi(\rho) = \sum_j A_j \rho A_j^\dagger, \qquad \sum_j A_j^\dagger A_j = \mathbb{I}.$$
+  </div>
+
+  <p>
+    Each Kraus operator $A_j$ is a $2\times 2$ matrix, so it too has a Pauli expansion:
+  </p>
+
+  <div class="math-block">
+    $$A_j = \alpha_j\mathbb{I} + \beta_j X + \gamma_j Y + \delta_j Z.$$
+  </div>
+
+  <p>
+    Running the syndrome measurement and correction on the channel output yields, by the
+    same argument as before:
+  </p>
+
+  <div class="math-block">
+    $$\xi \otimes |\psi\rangle\langle\psi|, \qquad \xi = \sum_j \Bigl(|\alpha_j|^2 \Pi_\mathbb{I} + |\beta_j|^2 \Pi_{X_k} + |\gamma_j|^2 \Pi_{X_kZ_k} + |\delta_j|^2 \Pi_{Z_k}\Bigr),$$
+  </div>
+
+  <p>
+    where $\Pi_E$ denotes the projector onto the syndrome register's state corresponding
+    to error $E$. The conclusion is identical to the unitary case: the logical state
+    $|\psi\rangle\langle\psi|$ is fully restored.
+  </p>
+
+  <div class="callout callout-math">
+    <div class="callout-title">Depolarizing channel — a concrete example</div>
+    <p style="margin-bottom:8px;">
+      The depolarizing channel with error rate $p$ is:
+      $$\Phi(\rho) = (1-p)\rho + \frac{p}{3}(X\rho X + Y\rho Y + Z\rho Z).$$
+      Its Kraus operators are $A_0 = \sqrt{1-p}\,\mathbb{I}$, $A_1 = \sqrt{p/3}\,X$,
+      $A_2 = \sqrt{p/3}\,Y$, $A_3 = \sqrt{p/3}\,Z$.
+    </p>
+    <p style="margin:0;">
+      After syndrome measurement and correction, the state is recovered with probability 1
+      (assuming $p$ is small enough that only single-qubit errors occur). The error rate $p$
+      only affects the probability distribution over the syndrome outcomes — not the ability
+      to correct.
+    </p>
+  </div>
+
+  <h3>Generalisation to multi-qubit codes</h3>
+
+  <p>
+    The same principle extends to codes that protect against errors on multiple qubits.
+    In that case, errors on $t$ qubits are expressed as tensor products of Paulis, and
+    the syndrome specifies which multi-qubit Pauli correction to apply.
+    The syndrome measurement still discretizes the error — it now projects onto a larger
+    but still finite set of Pauli strings.
+  </p>
+
+</section>
+
+<!-- ═══════════════════════ §9 FULL DEMO ═══════════════════════ -->
+<section id="demo">
+  <div class="section-label">Section 09</div>
+  <h2>Full Demo: Putting It All Together</h2>
+
+  <p>
+    We now combine all the pieces into a single runnable demonstration. The workflow is:
+  </p>
+
+  <ol class="steps">
+    <li>Generate a random normalised Pauli error operator $U = \alpha I + \beta X + \gamma Y + \delta Z$.</li>
+    <li>Encode $|0_L\rangle$ with the Shor code.</li>
+    <li>Apply the continuous error to a chosen target qubit.</li>
+    <li>Measure all 8 stabilizer generators (expectation values and projective).</li>
+    <li>Identify which error sector the syndrome corresponds to.</li>
+    <li>Observe that the syndrome uniquely identifies the Pauli component — discretization.</li>
+  </ol>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Complete discretization demo</div>
+    </div>
+    <pre><span class="cm">#!/usr/bin/env python3
+# Discretization of Errors — Shor Code Demo
+# All bugs from the original notebooks have been corrected.
+# Requires: qiskit, qiskit-aer, numpy</span>
+
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">random</span>
+<span class="kw">from</span> <span class="var">qiskit</span> <span class="kw">import</span> <span class="cls">QuantumCircuit</span>
+<span class="kw">from</span> <span class="var">qiskit.quantum_info</span> <span class="kw">import</span> <span class="cls">Statevector</span>, <span class="cls">SparsePauliOp</span>
+
+<span class="cm"># ═══ 1. Pauli string utilities ═══════════════════════════════════════════════</span>
+
+<span class="kw">def</span> <span class="fn">random_pauli_string</span><span class="paren">(</span><span class="var">n</span><span class="paren">)</span>:
+    <span class="kw">return</span> <span class="str">''</span>.<span class="fn">join</span><span class="paren">(</span><span class="var">random</span>.<span class="fn">choice</span><span class="paren">([</span><span class="str">'I'</span>,<span class="str">'X'</span>,<span class="str">'Y'</span>,<span class="str">'Z'</span><span class="paren">])</span> <span class="kw">for</span> <span class="var">_</span> <span class="kw">in</span> <span class="fn">range</span><span class="paren">(</span><span class="var">n</span><span class="paren">))</span>
+
+<span class="kw">def</span> <span class="fn">check_pauli_string</span><span class="paren">(</span><span class="var">s</span><span class="paren">)</span>:
+    <span class="var">n</span> <span class="op">=</span> <span class="fn">len</span><span class="paren">(</span><span class="var">s</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"Pauli string '{s}' (big-endian, rightmost = Q0):"</span><span class="paren">)</span>
+    <span class="kw">for</span> <span class="var">i</span>, <span class="var">p</span> <span class="kw">in</span> <span class="fn">enumerate</span><span class="paren">(</span><span class="var">s</span><span class="paren">)</span>:
+        <span class="kw">if</span> <span class="var">p</span> <span class="op">!=</span> <span class="str">'I'</span>:
+            <span class="fn">print</span><span class="paren">(</span><span class="str">f"  Q_{n-1-i} ← {p}"</span><span class="paren">)</span>
+
+<span class="cm"># ═══ 2. Error operator ═══════════════════════════════════════════════════════</span>
+
+<span class="kw">def</span> <span class="fn">random_error_operator</span><span class="paren">()</span>:
+    <span class="cm">"""Random αI + βX + γY + δZ with Σ|.|² = 1 (illustrative, not unitary)."""</span>
+    <span class="var">c</span> <span class="op">=</span> <span class="var">np</span>.<span class="var">random</span>.<span class="fn">randn</span><span class="paren">(</span><span class="num">4</span><span class="paren">)</span> <span class="op">+</span> <span class="num">1j</span> <span class="op">*</span> <span class="var">np</span>.<span class="var">random</span>.<span class="fn">randn</span><span class="paren">(</span><span class="num">4</span><span class="paren">)</span>
+    <span class="var">c</span> <span class="op">/=</span> <span class="var">np</span>.<span class="var">linalg</span>.<span class="fn">norm</span><span class="paren">(</span><span class="var">c</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">c</span>
+
+<span class="kw">def</span> <span class="fn">apply_error</span><span class="paren">(</span><span class="var">state</span>, <span class="var">coeffs</span>, <span class="var">target</span>, <span class="var">n</span><span class="op">=</span><span class="num">9</span><span class="paren">)</span>:
+    <span class="cm">"""Embed error on qubit `target`.  Uses single.tensor(op) — see §5."""</span>
+    <span class="var">op</span> <span class="op">=</span> <span class="kw">None</span>
+    <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="paren">(</span><span class="var">n</span><span class="paren">)</span>:
+        <span class="var">s</span> <span class="op">=</span> <span class="cls">SparsePauliOp</span><span class="paren">([</span><span class="str">'I'</span>,<span class="str">'X'</span>,<span class="str">'Y'</span>,<span class="str">'Z'</span><span class="paren">]</span>, <span class="var">coeffs</span><span class="paren">)</span> <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="var">target</span> <span class="kw">else</span> <span class="cls">SparsePauliOp</span><span class="paren">(</span><span class="str">'I'</span><span class="paren">)</span>
+        <span class="var">op</span> <span class="op">=</span> <span class="var">s</span> <span class="kw">if</span> <span class="var">op</span> <span class="kw">is</span> <span class="kw">None</span> <span class="kw">else</span> <span class="var">s</span>.<span class="fn">tensor</span><span class="paren">(</span><span class="var">op</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">state</span>.<span class="fn">evolve</span><span class="paren">(</span><span class="var">op</span><span class="paren">)</span>
+
+<span class="cm"># ═══ 3. Shor encoding ════════════════════════════════════════════════════════</span>
+
+<span class="kw">def</span> <span class="fn">shor_encode</span><span class="paren">()</span>:
+    <span class="var">qc</span> <span class="op">=</span> <span class="cls">QuantumCircuit</span><span class="paren">(</span><span class="num">9</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>,<span class="num">3</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>,<span class="num">6</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">([</span><span class="num">0</span>,<span class="num">3</span>,<span class="num">6</span><span class="paren">])</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>,<span class="num">1</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">0</span>,<span class="num">2</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">3</span>,<span class="num">4</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">3</span>,<span class="num">5</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">6</span>,<span class="num">7</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="num">6</span>,<span class="num">8</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">qc</span>
+
+<span class="cm"># ═══ 4. Syndrome measurement ══════════════════════════════════════════════════</span>
+
+<span class="cm"># Shor code stabilizers in Qiskit little-endian notation (rightmost char = Q0)
+# Z-type (bit-flip detection within blocks)</span>
+<span class="var">STABS_Z</span> <span class="op">=</span> <span class="paren">{</span>
+    <span class="str">"g1 Z0Z1"</span> : <span class="str">"IIIIIIIZZ"</span>,  <span class="cm"># block 1</span>
+    <span class="str">"g2 Z1Z2"</span> : <span class="str">"IIIIIIZZI"</span>,  <span class="cm"># block 1</span>
+    <span class="str">"g3 Z3Z4"</span> : <span class="str">"IIIIIZZII"</span>,  <span class="cm"># block 2</span>
+    <span class="str">"g4 Z4Z5"</span> : <span class="str">"IIIIZZIII"</span>,  <span class="cm"># block 2</span>
+    <span class="str">"g5 Z6Z7"</span> : <span class="str">"IIIZZIIIII"</span>[<span class="num">1</span>:],  <span class="cm"># block 3  →  "IIZZIIIII" trimmed</span>
+    <span class="str">"g6 Z7Z8"</span> : <span class="str">"ZZIIIIIII"</span>,  <span class="cm"># block 3</span>
+<span class="paren">}</span>
+<span class="cm"># X-type (phase-flip detection across blocks)</span>
+<span class="var">STABS_X</span> <span class="op">=</span> <span class="paren">{</span>
+    <span class="str">"g7 X0-X5"</span> : <span class="str">"IIIXXXXXX"</span>,  <span class="cm"># Q0..Q5</span>
+    <span class="str">"g8 X3-X8"</span> : <span class="str">"XXXXXXIII"</span>,  <span class="cm"># Q3..Q8</span>
+<span class="paren">}</span>
+
+<span class="kw">def</span> <span class="fn">read_syndrome</span><span class="paren">(</span><span class="var">state</span><span class="paren">)</span>:
+    <span class="cm">"""Return expectation values for all 8 Shor stabilizers."""</span>
+    <span class="var">results</span> <span class="op">=</span> <span class="paren">{}</span>
+    <span class="kw">for</span> <span class="var">name</span>, <span class="var">s</span> <span class="kw">in</span> <span class="paren">{</span><span class="op">**</span><span class="var">STABS_Z</span>, <span class="op">**</span><span class="var">STABS_X</span><span class="paren">}</span>.<span class="fn">items</span><span class="paren">()</span>:
+        <span class="var">results</span><span class="paren">[</span><span class="var">name</span><span class="paren">]</span> <span class="op">=</span> <span class="var">state</span>.<span class="fn">expectation_value</span><span class="paren">(</span><span class="cls">SparsePauliOp</span><span class="paren">(</span><span class="var">s</span><span class="paren">))</span>.<span class="var">real</span>
+    <span class="kw">return</span> <span class="var">results</span>
+
+<span class="kw">def</span> <span class="fn">infer_error</span><span class="paren">(</span><span class="var">syndrome</span><span class="paren">)</span>:
+    <span class="cm">"""Heuristic: identify the dominant error from the syndrome."""</span>
+    <span class="var">z_violated</span> <span class="op">=</span> <span class="paren">[</span><span class="var">k</span> <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">syndrome</span>.<span class="fn">items</span><span class="paren">()</span> <span class="kw">if</span> <span class="str">' Z'</span> <span class="kw">in</span> <span class="var">k</span> <span class="kw">and</span> <span class="var">v</span> <span class="op">&lt;</span> <span class="num">0</span><span class="paren">]</span>
+    <span class="var">x_violated</span> <span class="op">=</span> <span class="paren">[</span><span class="var">k</span> <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">syndrome</span>.<span class="fn">items</span><span class="paren">()</span> <span class="kw">if</span> <span class="str">' X'</span> <span class="kw">in</span> <span class="var">k</span> <span class="kw">and</span> <span class="var">v</span> <span class="op">&lt;</span> <span class="num">0</span><span class="paren">]</span>
+    <span class="kw">if</span>     <span class="var">z_violated</span> <span class="kw">and</span>     <span class="var">x_violated</span>: <span class="kw">return</span> <span class="str">"Y (bit+phase flip)"</span>
+    <span class="kw">elif</span>   <span class="var">z_violated</span> <span class="kw">and not</span> <span class="var">x_violated</span>: <span class="kw">return</span> <span class="str">"X (bit-flip)"</span>
+    <span class="kw">elif not</span> <span class="var">z_violated</span> <span class="kw">and</span>   <span class="var">x_violated</span>: <span class="kw">return</span> <span class="str">"Z (phase-flip)"</span>
+    <span class="kw">else</span>                                  : <span class="kw">return</span> <span class="str">"I (no error)"</span>
+
+<span class="cm"># ═══ 5. Run the demo ══════════════════════════════════════════════════════════</span>
+
+<span class="kw">def</span> <span class="fn">discretization_demo</span><span class="paren">(</span><span class="var">target_qubit</span><span class="op">=</span><span class="num">2</span>, <span class="var">seed</span><span class="op">=</span><span class="kw">None</span><span class="paren">)</span>:
+    <span class="kw">if</span> <span class="var">seed</span> <span class="kw">is not</span> <span class="kw">None</span>:
+        <span class="var">np</span>.<span class="var">random</span>.<span class="fn">seed</span><span class="paren">(</span><span class="var">seed</span><span class="paren">)</span>
+
+    <span class="cm"># Step 1 — random continuous error</span>
+    <span class="var">coeffs</span> <span class="op">=</span> <span class="fn">random_error_operator</span><span class="paren">()</span>
+    <span class="var">alpha</span>, <span class="var">beta</span>, <span class="var">gamma</span>, <span class="var">delta</span> <span class="op">=</span> <span class="var">coeffs</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">"═"</span> <span class="op">*</span> <span class="num">60</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"Error on Q{target_qubit}: U = αI + βX + γY + δZ"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"  α = {alpha:.4f}  |α|² = {abs(alpha)**2:.4f}"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"  β = {beta:.4f}  |β|² = {abs(beta)**2:.4f}"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"  γ = {gamma:.4f}  |γ|² = {abs(gamma)**2:.4f}"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"  δ = {delta:.4f}  |δ|² = {abs(delta)**2:.4f}"</span><span class="paren">)</span>
+
+    <span class="cm"># Step 2 — encode and apply error</span>
+    <span class="var">state</span> <span class="op">=</span> <span class="cls">Statevector</span>.<span class="fn">from_instruction</span><span class="paren">(</span><span class="fn">shor_encode</span><span class="paren">())</span>
+    <span class="var">errored</span> <span class="op">=</span> <span class="fn">apply_error</span><span class="paren">(</span><span class="var">state</span>, <span class="var">coeffs</span>, <span class="var">target_qubit</span><span class="paren">)</span>
+
+    <span class="cm"># Step 3 — read syndrome</span>
+    <span class="var">syn</span> <span class="op">=</span> <span class="fn">read_syndrome</span><span class="paren">(</span><span class="var">errored</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">"\nSyndrome (expectation values, +1 = no violation):"</span><span class="paren">)</span>
+    <span class="kw">for</span> <span class="var">name</span>, <span class="var">val</span> <span class="kw">in</span> <span class="var">syn</span>.<span class="fn">items</span><span class="paren">()</span>:
+        <span class="var">bar</span> <span class="op">=</span> <span class="str">"✗"</span> <span class="kw">if</span> <span class="var">val</span> <span class="op">&lt;</span> <span class="num">0</span> <span class="kw">else</span> <span class="str">"✓"</span>
+        <span class="fn">print</span><span class="paren">(</span><span class="str">f"  {bar} {name:12s}  ⟨S⟩ = {val:+.4f}"</span><span class="paren">)</span>
+
+    <span class="cm"># Step 4 — infer which Pauli error the syndrome points to</span>
+    <span class="var">inferred</span> <span class="op">=</span> <span class="fn">infer_error</span><span class="paren">(</span><span class="var">syn</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"\nInferred error type: {inferred}"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">"(The measurement has discretized the continuous error!)"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">"═"</span> <span class="op">*</span> <span class="num">60</span><span class="paren">)</span>
+
+<span class="cm"># ── Run it (try different seeds and target qubits) ───────────────────────────</span>
+<span class="fn">discretization_demo</span><span class="paren">(</span><span class="var">target_qubit</span><span class="op">=</span><span class="num">2</span>, <span class="var">seed</span><span class="op">=</span><span class="num">42</span><span class="paren">)</span>
+<span class="fn">discretization_demo</span><span class="paren">(</span><span class="var">target_qubit</span><span class="op">=</span><span class="num">5</span>, <span class="var">seed</span><span class="op">=</span><span class="num">7</span><span class="paren">)</span>
+<span class="fn">discretization_demo</span><span class="paren">(</span><span class="var">target_qubit</span><span class="op">=</span><span class="num">7</span>, <span class="var">seed</span><span class="op">=</span><span class="num">123</span><span class="paren">)</span></pre>
+  </div>
+
+  <div class="sep"><span>✦</span></div>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Summary — What the Discretization Demo Shows</div>
+    <p style="margin-bottom:10px;">
+      For each run: a <em>different</em> continuous error (random $\alpha,\beta,\gamma,\delta$)
+      is applied. Yet in every case, the syndrome expectation values fall into one of four
+      clear patterns, corresponding to an $\mathbb{I}$, $X$, $Y$, or $Z$ error on the target
+      qubit. The dominant Pauli component (largest $|\cdot|^2$) is the most probable syndrome
+      outcome.
+    </p>
+    <p style="margin:0;">
+      This is discretization in action: the measurement <em>forces</em> the error into one of
+      four discrete categories, and the appropriate Pauli correction fully restores the logical
+      state. No knowledge of $\alpha,\beta,\gamma,\delta$ is needed at correction time.
+    </p>
+  </div>
+
+  <h3>Exercises to try</h3>
+
+  <ul style="margin:0 0 18px 24px; line-height:2.2;">
+    <li>Set $\beta = 1$ and all other coefficients to zero. Verify that only the Z-type stabilizers in the target qubit's block are violated.</li>
+    <li>Set $\delta = 1$ only. Verify that only the X-type stabilizers are violated.</li>
+    <li>Use <span class="ic">qiskit.quantum_info.random_unitary(2)</span> to generate a proper Haar-random unitary and decompose it into Pauli coefficients. Does the discretization still work?</li>
+    <li>Try applying errors to two qubits simultaneously. How does the syndrome behave? When does the Shor code fail?</li>
+    <li>Replace the error with a depolarizing channel using <span class="ic">qiskit_aer.noise.depolarizing_error</span> and study the syndrome statistics over many shots.</li>
+  </ul>
+
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <div class="series-nav">
+    <a href="#">← Prev: The Shor Code [[9,1,3]]</a>
+    <a href="#">Next: The Steane Code [[7,1,3]] →</a>
+  </div>
+  <div>CSS Codes Tutorial Series &nbsp;·&nbsp; Quantum Error Correction &nbsp;·&nbsp; Based on IBM Quantum Learning</div>
+</footer>
+
+</body>
+</html>
