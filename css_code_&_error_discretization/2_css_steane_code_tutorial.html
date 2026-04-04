@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Codes II — The Steane Code [[7,1,3]]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['boldsymbol']},
+    tags: 'ams'
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+:root {
+  --bg:        #0b0e14;
+  --bg2:       #111520;
+  --bg3:       #161c2b;
+  --border:    #1e2840;
+  --border2:   #2a3658;
+  --text:      #d4d8e8;
+  --text-dim:  #7a84a0;
+  --accent:    #5d9cf5;
+  --accent2:   #a78bfa;
+  --accent3:   #34d399;
+  --accent4:   #f97316;
+  --red:       #f87171;
+  --yellow:    #fbbf24;
+  --code-bg:   #0d1117;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ── STARFIELD HEADER ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  padding: 60px 40px 50px;
+  border-bottom: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(167,139,250,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 60%, rgba(52,211,153,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-series {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-series::before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: var(--accent2);
+}
+.hero h1 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(28px, 4.5vw, 52px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #e8eaf6;
+  max-width: 680px;
+  margin-bottom: 16px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent2);
+}
+.hero-sub {
+  font-size: 16px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 28px;
+}
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 3px;
+  border: 1px solid;
+  letter-spacing: 0.05em;
+}
+.badge-blue   { color: var(--accent);  border-color: rgba(93,156,245,0.35);  background: rgba(93,156,245,0.06); }
+.badge-purple { color: var(--accent2); border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.06); }
+.badge-green  { color: var(--accent3); border-color: rgba(52,211,153,0.35);  background: rgba(52,211,153,0.06); }
+.badge-orange { color: var(--accent4); border-color: rgba(249,115,22,0.35);  background: rgba(249,115,22,0.06); }
+
+/* ── LAYOUT ── */
+.container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+/* ── TOC ── */
+.toc {
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  border-radius: 6px;
+  padding: 28px 32px;
+  margin: 48px 0 0;
+}
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.toc li:last-child { border-bottom: none; }
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent2);
+  min-width: 24px;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent2); }
+
+/* ── SECTION ── */
+section {
+  padding: 60px 0 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+section:first-of-type { border-top: none; }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+  max-width: 60px;
+}
+h2 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 700;
+  color: #e0e4f2;
+  margin-bottom: 24px;
+  line-height: 1.25;
+}
+h3 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 19px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent2);
+  margin: 36px 0 14px;
+}
+h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent3);
+  margin: 28px 0 10px;
+}
+p { margin-bottom: 18px; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-left: 3px solid;
+  padding: 16px 22px;
+  border-radius: 0 6px 6px 0;
+  margin: 28px 0;
+  font-size: 17px;
+}
+.callout-idea   { border-color: var(--accent);  background: rgba(93,156,245,0.06); }
+.callout-math   { border-color: var(--accent2); background: rgba(167,139,250,0.06); }
+.callout-warn   { border-color: var(--yellow);  background: rgba(251,191,36,0.06); }
+.callout-result { border-color: var(--accent3); background: rgba(52,211,153,0.06); }
+.callout-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.callout-idea   .callout-title { color: var(--accent); }
+.callout-math   .callout-title { color: var(--accent2); }
+.callout-warn   .callout-title { color: var(--yellow); }
+.callout-result .callout-title { color: var(--accent3); }
+
+/* ── CODE BLOCKS ── */
+.code-wrapper {
+  margin: 24px 0;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background: #0d1117;
+  border-bottom: 1px solid var(--border);
+}
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dots span {
+  width: 9px; height: 9px; border-radius: 50%;
+}
+.code-dots span:nth-child(1) { background: #ff5f57; }
+.code-dots span:nth-child(2) { background: #febc2e; }
+.code-dots span:nth-child(3) { background: #28c840; }
+pre {
+  background: var(--code-bg);
+  padding: 20px 24px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+code { font-family: 'JetBrains Mono', monospace; }
+
+/* syntax colors */
+.kw  { color: #c678dd; }
+.fn  { color: #61afef; }
+.str { color: #98c379; }
+.num { color: #d19a66; }
+.cm  { color: #5c6370; font-style: italic; }
+.cls { color: #e5c07b; }
+.op  { color: #56b6c2; }
+.var { color: #e06c75; }
+.paren { color: var(--text-dim); }
+
+/* ── MATH DISPLAY ── */
+.math-block {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 20px 28px;
+  margin: 20px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.math-block.labeled {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  text-align: left;
+}
+.math-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  padding-left: 16px;
+}
+
+/* ── QUBIT DIAGRAM ── */
+.circuit-container {
+  overflow-x: auto;
+  margin: 24px 0;
+}
+.circuit-diagram {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 2.2;
+  white-space: pre;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 20px 24px;
+  display: inline-block;
+  min-width: 100%;
+}
+.cw  { color: var(--text); }
+.cg  { color: var(--accent3); }
+.cb  { color: var(--accent); }
+.cp  { color: var(--accent2); }
+.cr  { color: var(--red); }
+.cy  { color: var(--yellow); }
+
+/* ── STABILIZER TABLE ── */
+.stab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin: 20px 0;
+}
+.stab-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border2);
+}
+.stab-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.stab-table tr:last-child td { border-bottom: none; }
+.stab-table tr:hover td { background: rgba(255,255,255,0.02); }
+.tag-z  { color: #f87171; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.tag-x  { color: #60a5fa; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.tag-l  { color: var(--accent3); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.tag-hi { background: rgba(167,139,250,0.15); }
+
+/* ── SYNDROME GRID ── */
+.syn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.syn-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.syn-card-head {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.syn-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  color: var(--accent2);
+  font-weight: 500;
+}
+.syn-desc { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
+
+/* ── ERROR BOX ── */
+.error-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 28px 0;
+}
+.error-card {
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 20px;
+  background: var(--bg2);
+}
+.error-card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 10px;
+}
+.ec-x  { border-left: 3px solid var(--red);    }
+.ec-z  { border-left: 3px solid var(--accent);  }
+.ec-y  { border-left: 3px solid var(--accent2); }
+.ec-x .error-card-title  { color: var(--red);    }
+.ec-z .error-card-title  { color: var(--accent); }
+.ec-y .error-card-title  { color: var(--accent2);}
+
+/* ── STEP LIST ── */
+.steps { list-style: none; counter-reset: step; margin: 20px 0; }
+.steps li {
+  counter-increment: step;
+  padding: 12px 0 12px 48px;
+  position: relative;
+  border-bottom: 1px dashed var(--border);
+}
+.steps li:last-child { border-bottom: none; }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.3);
+  color: var(--accent2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── INLINE CODE ── */
+.ic {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: var(--accent2);
+}
+
+/* ── COMPARISON BOX ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.compare-card {
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 20px;
+  background: var(--bg2);
+}
+.compare-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 12px;
+}
+.cc-shor  { border-top: 3px solid var(--accent4); }
+.cc-shor  .compare-title { color: var(--accent4); }
+.cc-steane{ border-top: 3px solid var(--accent2); }
+.cc-steane .compare-title { color: var(--accent2); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 32px;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  margin-top: 60px;
+}
+footer .series-nav {
+  display: flex;
+  justify-content: space-between;
+  max-width: 860px;
+  margin: 0 auto 24px;
+  font-size: 12px;
+}
+footer .series-nav a {
+  color: var(--accent2);
+  text-decoration: none;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .hero { padding: 40px 20px 36px; }
+  .container { padding: 0 20px; }
+  pre { font-size: 12px; }
+  .compare-grid { grid-template-columns: 1fr; }
+}
+
+/* ── SEPARATOR ── */
+.sep {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0;
+  color: var(--border2);
+}
+.sep::before, .sep::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.sep span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: var(--border2);
+}
+
+/* Hamming matrix display */
+.hmatrix {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  display: inline-block;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 12px 18px;
+  line-height: 2;
+  overflow-x: auto;
+}
+.hm-one  { color: var(--accent2); font-weight: 500; }
+.hm-zero { color: var(--text-dim); }
+.hm-head { color: var(--accent3); font-size: 11px; letter-spacing: .1em; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<div class="hero">
+  <div style="max-width:860px; margin:0 auto;">
+    <div class="hero-series">CSS Codes &nbsp;·&nbsp; Tutorial II of III</div>
+    <h1>The <em>Steane Code</em><br>[[7, 1, 3]]</h1>
+    <p class="hero-sub">1 logical qubit · 7 physical qubits · corrects arbitrary single-qubit errors</p>
+    <div class="badge-row">
+      <span class="badge badge-purple">CSS Construction</span>
+      <span class="badge badge-blue">Hamming [7,4,3]</span>
+      <span class="badge badge-green">Transversal Gates</span>
+      <span class="badge badge-orange">Qiskit · Python</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">Contents</div>
+  <ol>
+    <li><a href="#intuition">From Shor to Steane — the Key Improvement</a></li>
+    <li><a href="#css">The CSS Construction</a></li>
+    <li><a href="#math">Mathematical Formulation</a></li>
+    <li><a href="#stabilizers">Stabilizer Structure</a></li>
+    <li><a href="#circuit">Circuit Implementation — Qiskit</a></li>
+    <li><a href="#examples">Error Correction Examples</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════ §1 INTUITION ═══════════════════════ -->
+<section id="intuition">
+  <div class="section-label">Section 01</div>
+  <h2>From Shor to Steane — the Key Improvement</h2>
+
+  <p>
+    The Shor code (Tutorial I) was the first proof that quantum error correction exists.
+    It uses 9 qubits to encode 1 logical qubit and achieves distance 3 — correcting
+    any single-qubit error. But 9 qubits is far from optimal. Andrew Steane's 1996 insight
+    was to abandon the concatenated structure entirely and build a quantum code
+    <em>directly</em> from a classical linear code, using a framework called the
+    <strong>CSS construction</strong>.
+  </p>
+
+  <p>
+    The result is the $[[7, 1, 3]]$ Steane code: same distance as Shor, same correction
+    power, but only <strong>7 physical qubits</strong>. It is the smallest quantum code
+    with this capability, tight against the quantum Hamming bound.
+    More importantly, it inherits elegant structure from classical coding theory that
+    makes it far easier to analyze, implement, and extend.
+  </p>
+
+  <div class="compare-grid">
+    <div class="compare-card cc-shor">
+      <div class="compare-title">Shor Code [[9,1,3]]</div>
+      <p style="font-size:16px; margin-bottom:10px;">9 physical qubits, 8 stabilizers.</p>
+      <p style="font-size:16px; margin-bottom:10px;">Structure: two <em>concatenated</em> repetition codes. Bit-flip and phase-flip protection are completely separate layers.</p>
+      <p style="font-size:16px; margin-bottom:10px;">X and Z stabilizers act on different qubit sets; the code is not symmetric under $H^{\otimes 9}$.</p>
+      <p style="font-size:16px; margin:0; color:var(--text-dim);">Transversal gates: limited.</p>
+    </div>
+    <div class="compare-card cc-steane">
+      <div class="compare-title">Steane Code [[7,1,3]]</div>
+      <p style="font-size:16px; margin-bottom:10px;">7 physical qubits, 6 stabilizers.</p>
+      <p style="font-size:16px; margin-bottom:10px;">Structure: CSS code from the classical $[7,4,3]$ Hamming code. Bit-flip and phase-flip protection arise from the <em>same</em> parity-check matrix.</p>
+      <p style="font-size:16px; margin-bottom:10px;">X and Z stabilizers act on <em>identical</em> qubit supports — the code is self-dual under $H^{\otimes 7}$.</p>
+      <p style="font-size:16px; margin:0; color:var(--accent3);">Transversal gates: $X$, $Z$, $H$, $\text{CNOT}$, $S^\dagger$.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-idea">
+    <div class="callout-title">The Central Idea</div>
+    <p style="margin:0;">
+      Take a classical linear code $C$ that <em>contains its own dual</em> ($C^\perp \subseteq C$).
+      Build an $X$-type stabilizer group from the rows of $C$'s parity check matrix,
+      and a $Z$-type stabilizer group from the same rows.
+      Because $C$ contains its dual, these two sets of stabilizers automatically commute —
+      giving you a valid quantum code. The correction capability of the quantum code
+      inherits the distance of the classical code.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §2 CSS CONSTRUCTION ═══════════════════════ -->
+<section id="css">
+  <div class="section-label">Section 02</div>
+  <h2>The CSS Construction</h2>
+
+  <h3>Classical codes and their duals</h3>
+
+  <p>
+    Recall that a classical binary linear $[n, k, d]$ code $C$ is defined by a
+    <strong>parity check matrix</strong> $H \in \mathbb{F}_2^{(n-k)\times n}$:
+    a binary string $\mathbf{x} \in \mathbb{F}_2^n$ is a codeword if and only if
+    $H\mathbf{x}^\top = \mathbf{0}$.
+    The <strong>dual code</strong> $C^\perp$ consists of all binary strings orthogonal
+    to every codeword of $C$: $C^\perp = \{\mathbf{y} : \mathbf{x}\cdot\mathbf{y} = 0
+    \text{ for all } \mathbf{x}\in C\}$.
+  </p>
+
+  <p>
+    The CSS construction requires two classical codes $C_1$ and $C_2$ with
+    $C_2^\perp \subseteq C_1$. For the <em>self-dual</em> or
+    <em>weakly self-dual</em> case used by Steane, we take $C_1 = C_2 = C$
+    and require $C^\perp \subseteq C$.
+    This is equivalent to asking that the rows of $H$ are themselves codewords of $C$,
+    i.e. $H H^\top = 0$ over $\mathbb{F}_2$.
+  </p>
+
+  <div class="callout callout-math">
+    <div class="callout-title">CSS Theorem (Calderbank–Shor–Steane)</div>
+    <p style="margin-bottom:10px;">
+      Let $C = [n, k, d]$ be a classical binary linear code with $C^\perp \subseteq C$
+      and parity check matrix $H \in \mathbb{F}_2^{(n-k)\times n}$.
+      Then there exists a quantum code $\mathcal{Q} = [[n,\, 2k - n,\, d]]$ with:
+    </p>
+    <ul style="margin:0 0 0 20px; line-height:2;">
+      <li>$n-k$ $X$-type stabilizer generators, one per row of $H$.</li>
+      <li>$n-k$ $Z$-type stabilizer generators, one per row of $H$.</li>
+      <li>Distance $d$ inherited from the classical minimum distance.</li>
+    </ul>
+    <p style="margin:10px 0 0;">
+      The stabilizers commute because $H H^\top = 0 \pmod{2}$: every $X$-stabilizer
+      shares an even number of qubits with every $Z$-stabilizer, so they commute.
+    </p>
+  </div>
+
+  <h3>Why the [7,4,3] Hamming code?</h3>
+
+  <p>
+    The classical binary $[7, 4, 3]$ Hamming code is the perfect single-error-correcting
+    code on 7 bits. Its parity check matrix is:
+  </p>
+
+  <div style="text-align:center; margin:24px 0;">
+    <div class="hmatrix">
+      <div class="hm-head" style="margin-bottom:4px;">          q₀ q₁ q₂ q₃ q₄ q₅ q₆</div>
+      <div>H =   <span class="hm-zero">[ </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero"> ]</span>  <span class="hm-head">← r₁</span></div>
+      <div>      <span class="hm-zero">[ </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero"> ]</span>  <span class="hm-head">← r₂</span></div>
+      <div>      <span class="hm-zero">[ </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-zero">0</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero">  </span><span class="hm-one">1</span><span class="hm-zero"> ]</span>  <span class="hm-head">← r₃</span></div>
+    </div>
+  </div>
+
+  <p>
+    This matrix has the remarkable property that its three rows are themselves codewords
+    of the Hamming code (each has weight 4, which is ≥ 3). One can verify that
+    $H H^\top = 0 \pmod{2}$, confirming $C^\perp \subseteq C$.
+    Therefore, applying the CSS theorem yields the $[[7, 2\cdot4-7, 3]] = [[7,1,3]]$
+    Steane code.
+  </p>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Perfect Hamming code → perfect quantum code</div>
+    <p style="margin:0;">
+      The classical $[7,4,3]$ Hamming code saturates the classical Hamming bound.
+      Its quantum descendant, the Steane $[[7,1,3]]$ code, saturates the
+      <em>quantum</em> Hamming bound:
+      $\sum_{j=0}^{1}\binom{7}{j}3^j = 1 + 21 = 22 \leq 2^{7-1} = 64$.
+      The Steane code is the smallest possible quantum code that corrects all single-qubit errors,
+      achievable only because the Hamming code is perfect.
+    </p>
+  </div>
+
+  <h3>The syndrome decoding miracle</h3>
+
+  <p>
+    In the classical Hamming code, each column of $H$ is the binary representation of its
+    column index (1 through 7). When a single-bit error occurs at position $k$, the
+    syndrome $H\mathbf{e}_k$ gives exactly the binary representation of $k+1$.
+    This means the syndrome <em>directly encodes the error location</em>: no lookup
+    table is needed beyond a 3-bit binary-to-integer conversion.
+  </p>
+
+  <div style="text-align:center; margin:24px 0;">
+    <div class="hmatrix">
+      <div class="hm-head" style="margin-bottom:6px;">Column index:  1    2    3    4    5    6    7</div>
+      <div class="hm-head" style="margin-bottom:4px;">Qubit index:  q₀   q₁   q₂   q₃   q₄   q₅   q₆</div>
+      <div>r₁:  <span class="hm-one">1</span>    <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-head">(bit 0 of index)</span></div>
+      <div>r₂:  <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-one">1</span>    <span class="hm-zero">0</span>    <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-one">1</span>    <span class="hm-head">(bit 1 of index)</span></div>
+      <div>r₃:  <span class="hm-zero">0</span>    <span class="hm-zero">0</span>    <span class="hm-zero">0</span>    <span class="hm-one">1</span>    <span class="hm-one">1</span>    <span class="hm-one">1</span>    <span class="hm-one">1</span>    <span class="hm-head">(bit 2 of index)</span></div>
+    </div>
+  </div>
+
+  <p>
+    The quantum Steane code inherits this property for <em>both</em> $X$ and $Z$ errors
+    independently, giving a 3-bit syndrome for each error type that directly decodes to
+    the faulty qubit's index. This is a dramatic improvement over the Shor code's
+    syndrome lookup.
+  </p>
+
+</section>
+
+<!-- ═══════════════════════ §3 MATH ═══════════════════════ -->
+<section id="math">
+  <div class="section-label">Section 03</div>
+  <h2>Mathematical Formulation</h2>
+
+  <h3>Logical codewords</h3>
+
+  <p>
+    The logical codewords of the Steane code are superpositions of all elements of the
+    dual code $C^\perp = [7,3,4]$ shifted by a logical representative. Let
+    $\mathbf{c}_i$ denote the $2^3 = 8$ codewords of $C^\perp$.
+    The logical codewords are:
+  </p>
+
+  <div class="math-block">
+    $$|0_L\rangle = \frac{1}{\sqrt{8}} \sum_{\mathbf{v} \in C^\perp} |\mathbf{v}\rangle,
+    \qquad
+    |1_L\rangle = \frac{1}{\sqrt{8}} \sum_{\mathbf{v} \in C^\perp} |\mathbf{v} + \mathbf{t}\rangle$$
+  </div>
+
+  <p>
+    where $\mathbf{t}$ is any coset representative of $C / C^\perp$, i.e. any codeword
+    in $C$ that is <em>not</em> in $C^\perp$.
+    Expanding this concretely, the 8 codewords of $C^\perp$ are:
+  </p>
+
+  <div class="math-block" style="text-align:left; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:2;">
+    $C^\perp$: &nbsp;
+    <span style="color:var(--accent3);">0000000</span>,
+    <span style="color:var(--accent2);">1010101</span>,
+    <span style="color:var(--accent2);">0110011</span>,
+    <span style="color:var(--accent2);">1100110</span>,
+    <span style="color:var(--accent2);">0001111</span>,
+    <span style="color:var(--accent2);">1011010</span>,
+    <span style="color:var(--accent2);">0111100</span>,
+    <span style="color:var(--accent2);">1101001</span>
+  </div>
+
+  <p>
+    so the logical zero state is:
+  </p>
+
+  <div class="math-block">
+    $$\boxed{|0_L\rangle = \tfrac{1}{\sqrt{8}}\bigl(|0000000\rangle + |1010101\rangle + |0110011\rangle + |1100110\rangle + |0001111\rangle + |1011010\rangle + |0111100\rangle + |1101001\rangle\bigr)}$$
+  </div>
+
+  <p>
+    and $|1_L\rangle$ is obtained by flipping all bits in each term (applying $X^{\otimes 7}$):
+  </p>
+
+  <div class="math-block">
+    $$|1_L\rangle = \tfrac{1}{\sqrt{8}}\bigl(|1111111\rangle + |0101010\rangle + |1001100\rangle + |0011001\rangle + |1110000\rangle + |0100101\rangle + |1000011\rangle + |0010110\rangle\bigr)$$
+  </div>
+
+  <div class="callout callout-math">
+    <div class="callout-title">Self-duality under the Hadamard</div>
+    <p style="margin:0;">
+      Because the Steane code is self-dual ($C^\perp \subseteq C$), applying
+      $H^{\otimes 7}$ maps $|0_L\rangle \leftrightarrow |+_L\rangle$ and
+      $|1_L\rangle \leftrightarrow |-_L\rangle$, just as the single-qubit Hadamard
+      maps $|0\rangle \leftrightarrow |+\rangle$.
+      This means $H^{\otimes 7}$ is a <strong>transversal logical Hadamard</strong>:
+      it implements $\bar{H}$ on the logical qubit. The Shor code, being non-self-dual,
+      cannot do this.
+    </p>
+  </div>
+
+  <h3>Logical operators</h3>
+
+  <p>
+    The logical Pauli operators must (i) commute with all stabilizers and (ii) not themselves
+    be stabilizers. The weight-7 representatives are the simplest to state:
+  </p>
+
+  <div class="math-block">
+    $$\bar{X} = X_0 X_1 X_2 X_3 X_4 X_5 X_6, \qquad \bar{Z} = Z_0 Z_1 Z_2 Z_3 Z_4 Z_5 Z_6.$$
+  </div>
+
+  <p>
+    But these can be reduced modulo the stabilizer group.
+    The minimum-weight logical operators have weight 3, for example:
+  </p>
+
+  <div class="math-block">
+    $$\bar{X}_{\min} = X_0 X_2 X_4 X_6 \cdot (X\text{-stabilizer})^{-1} \sim X_4 X_5 X_6,
+    \qquad
+    \bar{Z}_{\min} \sim Z_4 Z_5 Z_6.$$
+  </div>
+
+  <p>
+    The existence of weight-3 logical operators is equivalent to the code having distance 3:
+    any 3-qubit Pauli operator that commutes with all stabilizers but is not itself a
+    stabilizer constitutes a logical operation — and therefore an uncorrectable 3-qubit
+    error pattern.
+  </p>
+
+  <h3>Code parameters and the quantum Hamming bound</h3>
+
+  <p>
+    The Steane code is a $[[7, 1, 3]]$ code: $n = 7$ physical qubits, $k = 1$ logical
+    qubit, distance $d = 3$. It corrects any single-qubit error ($t = 1$).
+  </p>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Quantum Hamming Bound — saturated</div>
+    <p style="margin-bottom:10px;">
+      The quantum Hamming bound for a non-degenerate $[[n, k, d]]$ code correcting $t$ errors is:
+      $$\sum_{j=0}^{t} \binom{n}{j} 3^j \leq 2^{n-k}.$$
+    </p>
+    <p style="margin-bottom:10px;">
+      For $t=1$: the number of correctable errors per qubit is 3 (one $X$, one $Y$, one $Z$),
+      plus the identity. For $n=7, k=1$:
+    </p>
+    <p style="margin:0;">
+      $\binom{7}{0}3^0 + \binom{7}{1}3^1 = 1 + 21 = 22 \leq 2^{7-1} = 64$.
+      The bound is satisfied. Moreover, no $[[n,1,3]]$ code exists for $n < 7$, making
+      the Steane code <strong>optimal among distance-3 single-logical-qubit codes</strong>.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §4 STABILIZERS ═══════════════════════ -->
+<section id="stabilizers">
+  <div class="section-label">Section 04</div>
+  <h2>Stabilizer Structure</h2>
+
+  <p>
+    The Steane code has 6 stabilizer generators — 3 of $X$-type (detecting $Z$ errors)
+    and 3 of $Z$-type (detecting $X$ errors) — each derived directly from a row of the
+    Hamming parity check matrix $H$.
+  </p>
+
+  <h3>Generators from the parity check matrix</h3>
+
+  <p>
+    The three $X$-type generators are formed by replacing each 1 in a row of $H$ with
+    an $X$ gate on the corresponding qubit (and $I$ on the others).
+    The $Z$-type generators are formed identically using $Z$ gates.
+  </p>
+
+  <table class="stab-table">
+    <thead>
+      <tr>
+        <th>Generator</th>
+        <th>Type</th>
+        <th>Qubits acted on</th>
+        <th>Qiskit string (rightmost = q₀)</th>
+        <th>Detects</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>$g_1$</td>
+        <td class="tag-x">X-type</td>
+        <td>$q_0, q_2, q_4, q_6$</td>
+        <td class="tag-x">XIXIXIX</td>
+        <td>$Z$ errors (phase-flip)</td>
+      </tr>
+      <tr>
+        <td>$g_2$</td>
+        <td class="tag-x">X-type</td>
+        <td>$q_1, q_2, q_5, q_6$</td>
+        <td class="tag-x">XXIIXXI</td>
+        <td>$Z$ errors (phase-flip)</td>
+      </tr>
+      <tr>
+        <td>$g_3$</td>
+        <td class="tag-x">X-type</td>
+        <td>$q_3, q_4, q_5, q_6$</td>
+        <td class="tag-x">XXXXIII</td>
+        <td>$Z$ errors (phase-flip)</td>
+      </tr>
+      <tr class="tag-hi">
+        <td>$g_4$</td>
+        <td class="tag-z">Z-type</td>
+        <td>$q_0, q_2, q_4, q_6$</td>
+        <td class="tag-z">ZIZIZIZ</td>
+        <td>$X$ errors (bit-flip)</td>
+      </tr>
+      <tr class="tag-hi">
+        <td>$g_5$</td>
+        <td class="tag-z">Z-type</td>
+        <td>$q_1, q_2, q_5, q_6$</td>
+        <td class="tag-z">ZZIIZZII</td>
+        <td>$X$ errors (bit-flip)</td>
+      </tr>
+      <tr class="tag-hi">
+        <td>$g_6$</td>
+        <td class="tag-z">Z-type</td>
+        <td>$q_3, q_4, q_5, q_6$</td>
+        <td class="tag-z">ZZZZIII</td>
+        <td>$X$ errors (bit-flip)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">Self-dual symmetry</div>
+    <p style="margin:0;">
+      Notice that $g_1$ and $g_4$ act on exactly the same set of qubits — only the Pauli
+      type ($X$ vs $Z$) differs. The same holds for $(g_2, g_5)$ and $(g_3, g_6)$.
+      This is the hallmark of a CSS code built from a self-dual classical code.
+      The $X$ and $Z$ stabilizers are isomorphic, which guarantees that
+      the code treats bit-flip and phase-flip errors on equal footing.
+    </p>
+  </div>
+
+  <h3>Why the stabilizers commute</h3>
+
+  <p>
+    Two Pauli operators $P$ and $Q$ on $n$ qubits commute if and only if they overlap
+    on an <em>even</em> number of positions where both are non-identity.
+    For the Steane code: any $X$-stabilizer $g_i$ and $Z$-stabilizer $g_j$ overlap on
+    the positions where both the $i$-th and $j$-th rows of $H$ are 1.
+    The overlap count equals the inner product $r_i \cdot r_j$ over $\mathbb{F}_2$.
+    Since $H H^\top = 0 \pmod 2$, every such inner product is zero — meaning the overlap
+    is even, and the operators commute.
+  </p>
+
+  <div style="text-align:center; margin:20px 0 30px;">
+    <div class="hmatrix">
+      <div class="hm-head" style="margin-bottom:6px;">H H<sup>T</sup> mod 2 — must equal 0</div>
+      <div>r₁·r₁ = 1+0+1+0+1+0+1 = 4 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+      <div>r₁·r₂ = 0+0+1+0+0+0+1 = 2 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+      <div>r₁·r₃ = 0+0+0+0+1+0+1 = 2 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+      <div>r₂·r₂ = 0+1+1+0+0+1+1 = 4 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+      <div>r₂·r₃ = 0+0+0+0+0+1+1 = 2 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+      <div>r₃·r₃ = 0+0+0+1+1+1+1 = 4 ≡ <span class="hm-zero">0</span> &nbsp; ✓</div>
+    </div>
+  </div>
+
+  <h3>Syndrome decoding table</h3>
+
+  <p>
+    The 3-bit $Z$-syndrome $(s_1, s_2, s_3)$ encodes the location of an $X$ error;
+    the 3-bit $X$-syndrome $(s_4, s_5, s_6)$ encodes the location of a $Z$ error.
+    In both cases the syndrome bits are precisely the binary representation of the
+    faulty qubit's index (1-indexed), so decoding is arithmetic:
+    $k = s_1 \cdot 1 + s_2 \cdot 2 + s_3 \cdot 4 - 1$ for qubit $q_k$.
+  </p>
+
+  <table class="stab-table">
+    <thead>
+      <tr>
+        <th>Syndrome $(s_1 s_2 s_3)$</th>
+        <th>Binary value</th>
+        <th>Error location</th>
+        <th>Correction</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>000</td><td>0</td><td>No error</td><td>None</td></tr>
+      <tr><td>100</td><td>1</td><td>$q_0$</td><td>Apply $X_0$ or $Z_0$</td></tr>
+      <tr><td>010</td><td>2</td><td>$q_1$</td><td>Apply $X_1$ or $Z_1$</td></tr>
+      <tr><td>110</td><td>3</td><td>$q_2$</td><td>Apply $X_2$ or $Z_2$</td></tr>
+      <tr><td>001</td><td>4</td><td>$q_3$</td><td>Apply $X_3$ or $Z_3$</td></tr>
+      <tr><td>101</td><td>5</td><td>$q_4$</td><td>Apply $X_4$ or $Z_4$</td></tr>
+      <tr><td>011</td><td>6</td><td>$q_5$</td><td>Apply $X_5$ or $Z_5$</td></tr>
+      <tr><td class="tag-l">111</td><td class="tag-l">7</td><td class="tag-l">$q_6$</td><td class="tag-l">Apply $X_6$ or $Z_6$</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    The correction type ($X$ or $Z$) is determined by which syndrome (Z-stabilizers → $X$ correction;
+    X-stabilizers → $Z$ correction).
+    A $Y = iXZ$ error triggers <em>both</em> syndromes simultaneously, and both are corrected
+    independently — the two correction paths are orthogonal.
+  </p>
+
+  <h3>Logical operators and the codespace dimension</h3>
+
+  <p>
+    The codespace is the simultaneous $+1$ eigenspace of all 6 stabilizers.
+    The 6 generators each halve the available Hilbert space dimension, leaving
+    $2^7 / 2^6 = 2$ dimensions — exactly enough for one logical qubit.
+    The logical operators $\bar{X}$ and $\bar{Z}$ commute with all generators
+    (by the same inner-product argument) but anticommute with each other,
+    confirming they implement the algebra of a single qubit.
+  </p>
+
+  <h3>Transversal gates — a key advantage</h3>
+
+  <p>
+    A gate is <em>transversal</em> if it can be implemented by applying independent
+    single-qubit (or two-qubit) operations to each physical qubit, without coupling
+    between the code blocks. Transversal gates are desirable because they do not
+    spread errors within a block.
+  </p>
+
+  <div class="error-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px,1fr));">
+    <div class="error-card ec-x">
+      <div class="error-card-title">Logical $\bar{X}$</div>
+      <p style="font-size:16px; margin:0;">Apply $X$ to every physical qubit: $X^{\otimes 7}$.</p>
+    </div>
+    <div class="error-card ec-z">
+      <div class="error-card-title">Logical $\bar{Z}$</div>
+      <p style="font-size:16px; margin:0;">Apply $Z$ to every physical qubit: $Z^{\otimes 7}$.</p>
+    </div>
+    <div class="error-card" style="border-left:3px solid var(--accent3);">
+      <div class="error-card-title" style="color:var(--accent3);">Logical $\bar{H}$</div>
+      <p style="font-size:16px; margin:0;">Apply $H$ to every physical qubit: $H^{\otimes 7}$. Valid because the code is self-dual.</p>
+    </div>
+    <div class="error-card" style="border-left:3px solid var(--yellow);">
+      <div class="error-card-title" style="color:var(--yellow);">Logical CNOT</div>
+      <p style="font-size:16px; margin:0;">Apply CNOT between corresponding physical qubits of two code blocks: $\text{CNOT}^{\otimes 7}$.</p>
+    </div>
+    <div class="error-card" style="border-left:3px solid var(--text-dim);">
+      <div class="error-card-title" style="color:var(--text-dim);">Logical $\bar{S}^\dagger$</div>
+      <p style="font-size:16px; margin:0;">Apply $S^\dagger$ to every physical qubit. Together with $\bar{H}$, generates the full Clifford group logically.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">Non-Clifford gates require magic state injection</div>
+    <p style="margin:0;">
+      Transversal gates only generate the Clifford group. Implementing the $T$ gate
+      (needed for universal quantum computation) requires a non-transversal technique
+      such as <em>magic state distillation</em> or <em>code switching</em>. This is
+      a fundamental limitation of any CSS code, not just Steane's.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §5 CIRCUIT ═══════════════════════ -->
+<section id="circuit">
+  <div class="section-label">Section 05</div>
+  <h2>Circuit Implementation — Qiskit</h2>
+
+  <h3>1. Encoding circuit</h3>
+
+  <p>
+    The encoding maps $|\psi\rangle|000000\rangle$ to the Steane codeword.
+    The qubit $q_0$ holds the logical input; $q_1\ldots q_6$ are ancillas initialised
+    to $|0\rangle$.
+    The strategy mirrors the CSS structure: Hadamard gates create superpositions encoding
+    the dual code $C^\perp$, and CNOT gates spread the information according to $H$.
+  </p>
+
+  <ol class="steps">
+    <li>
+      Apply $H$ to $q_4$, $q_5$, $q_6$ (the three "check" qubits).
+      This creates $|+\rangle$ superpositions that will carry the dual-code structure.
+    </li>
+    <li>
+      Spread $q_6$ to $q_0$, $q_2$, $q_4$ via CNOT (from row $r_1$ of $H$):
+      $\mathrm{CX}(q_6, q_0)$, $\mathrm{CX}(q_6, q_2)$.
+    </li>
+    <li>
+      Spread $q_5$ to $q_1$, $q_2$ via CNOT (from row $r_2$):
+      $\mathrm{CX}(q_5, q_1)$, $\mathrm{CX}(q_5, q_2)$.
+    </li>
+    <li>
+      Spread $q_4$ to $q_3$ via CNOT (from row $r_3$):
+      $\mathrm{CX}(q_4, q_3)$.
+    </li>
+    <li>
+      Apply CNOT gates from $q_0$ (the logical qubit) to $q_1$, $q_2$, $q_3$, $q_4$, $q_5$, $q_6$
+      to spread the logical information across all qubits.
+    </li>
+  </ol>
+
+  <div class="circuit-container">
+    <div class="circuit-diagram"><span class="cb">q₀ (logical)</span> <span class="cw">──●──────────────────────●──●──●──●──●──●──</span>
+                   <span class="cw">  │                    │  │  │  │  │  │</span>
+<span class="cb">q₁           </span> <span class="cw">──┼────────────────────⊕──┼──┼──┼──┼──┼──</span>  <span class="cm">← spreads from q₅, q₀</span>
+                   <span class="cw">  │                    │  │  │  │  │</span>
+<span class="cb">q₂           </span> <span class="cw">──┼────────────────────┼──⊕──┼──┼──┼──┼──</span>  <span class="cm">← spreads from q₅, q₆, q₀</span>
+                   <span class="cw">  │                       │  │  │  │</span>
+<span class="cb">q₃           </span> <span class="cw">──┼───────────────────────────⊕──┼──┼──┼──</span>  <span class="cm">← spreads from q₄, q₀</span>
+                   <span class="cw">  │                          │  │  │</span>
+<span class="cb">q₄           </span> <span class="cw">──┼──┤H├──●───────────────────────⊕──┼──┼──</span>  <span class="cm">← superposition + q₀</span>
+                   <span class="cw">  │       │                      │  │</span>
+<span class="cb">q₅           </span> <span class="cw">──┼──┤H├──┼──●──●──────────────────────⊕──┼──</span>  <span class="cm">← superposition + q₀</span>
+                   <span class="cw">  │          │  │                   │</span>
+<span class="cb">q₆           </span> <span class="cw">──┼──┤H├──┼──┼──┼──●──●────────────────────⊕──</span>  <span class="cm">← superposition + q₀</span>
+                   <span class="cw">         │  │  │  │  │</span>
+                   <span class="cm">         └──┘  └──┘  └── (CNOT targets)</span></div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Steane encoding circuit</div>
+    </div>
+    <pre><span class="kw">from</span> <span class="var">qiskit</span> <span class="kw">import</span> <span class="cls">QuantumCircuit</span>, <span class="cls">QuantumRegister</span>, <span class="cls">ClassicalRegister</span>
+<span class="kw">from</span> <span class="var">qiskit.quantum_info</span> <span class="kw">import</span> <span class="cls">Statevector</span>, <span class="cls">SparsePauliOp</span>
+<span class="kw">from</span> <span class="var">qiskit_aer</span> <span class="kw">import</span> <span class="cls">AerSimulator</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+
+<span class="kw">def</span> <span class="fn">steane_encode</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">d</span><span class="paren">)</span>:
+    <span class="str">"""
+    Encode d[0] (logical input qubit) into 7 data qubits d[0]..d[6].
+    Assumes d[1]..d[6] are initialised to |0⟩.
+
+    The encoding follows the CSS structure:
+      - H gates on d[4], d[5], d[6] create superpositions (dual code C⊥).
+      - CNOT gates spread information according to the rows of H_7.
+      - CNOT gates from d[0] spread the logical qubit across all qubits.
+    """</span>
+    <span class="cm"># ── Step 1: Superpositions on check qubits ─────────────────</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">)</span>
+
+    <span class="cm"># ── Step 2: Spread d[6] → d[0], d[2]  (row r₁ of H: 1_0 1_0 1_0 1) ──</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span><span class="paren">)</span>
+
+    <span class="cm"># ── Step 3: Spread d[5] → d[1], d[2]  (row r₂ of H: 0 1 1_0 0 1 1) ──</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">1</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span><span class="paren">)</span>
+
+    <span class="cm"># ── Step 4: Spread d[4] → d[3]        (row r₃ of H: 0 0 0 1 1 1 1) ──</span>
+    <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">3</span><span class="paren">]</span><span class="paren">)</span>
+
+    <span class="cm"># ── Step 5: Spread logical qubit d[0] across all qubits ────</span>
+    <span class="kw">for</span> <span class="var">target</span> <span class="kw">in</span> <span class="paren">[</span><span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span><span class="paren">]</span>:
+        <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="var">target</span><span class="paren">]</span><span class="paren">)</span>
+
+<span class="cm"># ── Build and draw the encoding circuit ────────────────────────────────</span>
+<span class="var">d</span> <span class="op">=</span> <span class="cls">QuantumRegister</span><span class="paren">(</span><span class="num">7</span>, <span class="str">'d'</span><span class="paren">)</span>
+<span class="var">qc_enc</span> <span class="op">=</span> <span class="cls">QuantumCircuit</span><span class="paren">(</span><span class="var">d</span><span class="paren">)</span>
+<span class="fn">steane_encode</span><span class="paren">(</span><span class="var">qc_enc</span>, <span class="var">d</span><span class="paren">)</span>
+<span class="var">qc_enc</span>.<span class="fn">draw</span><span class="paren">(</span><span class="str">'mpl'</span><span class="paren">)</span></pre>
+  </div>
+
+  <h3>2. Syndrome measurement</h3>
+
+  <p>
+    Each of the 6 stabilizers is measured using one ancilla qubit. The technique depends
+    on the stabilizer type:
+  </p>
+
+  <div class="error-grid" style="grid-template-columns:1fr 1fr;">
+    <div class="error-card ec-x">
+      <div class="error-card-title">Z-type stabilizer ($g_4, g_5, g_6$)</div>
+      <p style="font-size:16px; margin:0;">
+        Ancilla in $|0\rangle$. Apply CX from each target data qubit to the ancilla.
+        Measure ancilla: outcome $0 \to +1$, outcome $1 \to -1$ (parity violated).
+      </p>
+    </div>
+    <div class="error-card ec-z">
+      <div class="error-card-title">X-type stabilizer ($g_1, g_2, g_3$)</div>
+      <p style="font-size:16px; margin:0;">
+        Ancilla in $|+\rangle$ (apply $H$ first). Apply CX from ancilla to each target data qubit.
+        Apply $H$ to ancilla, then measure. Outcome $0 \to +1$, outcome $1 \to -1$.
+      </p>
+    </div>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Syndrome measurement</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">measure_z_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">ancilla</span>, <span class="var">data_qubits</span>, <span class="var">classical_bit</span>, <span class="var">creg</span><span class="paren">)</span>:
+    <span class="str">"""Measure a Z-type stabilizer. Detects X (bit-flip) errors."""</span>
+    <span class="kw">for</span> <span class="var">q</span> <span class="kw">in</span> <span class="var">data_qubits</span>:
+        <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">q</span>, <span class="var">ancilla</span><span class="paren">)</span>     <span class="cm"># data → ancilla: encodes parity</span>
+    <span class="var">qc</span>.<span class="fn">measure</span><span class="paren">(</span><span class="var">ancilla</span>, <span class="var">creg</span><span class="paren">[</span><span class="var">classical_bit</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">reset</span><span class="paren">(</span><span class="var">ancilla</span><span class="paren">)</span>
+
+<span class="kw">def</span> <span class="fn">measure_x_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">ancilla</span>, <span class="var">data_qubits</span>, <span class="var">classical_bit</span>, <span class="var">creg</span><span class="paren">)</span>:
+    <span class="str">"""Measure an X-type stabilizer. Detects Z (phase-flip) errors."""</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">ancilla</span><span class="paren">)</span>                <span class="cm"># ancilla → |+⟩</span>
+    <span class="kw">for</span> <span class="var">q</span> <span class="kw">in</span> <span class="var">data_qubits</span>:
+        <span class="var">qc</span>.<span class="fn">cx</span><span class="paren">(</span><span class="var">ancilla</span>, <span class="var">q</span><span class="paren">)</span>      <span class="cm"># ancilla → data: X-basis parity</span>
+    <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">ancilla</span><span class="paren">)</span>                <span class="cm"># rotate back</span>
+    <span class="var">qc</span>.<span class="fn">measure</span><span class="paren">(</span><span class="var">ancilla</span>, <span class="var">creg</span><span class="paren">[</span><span class="var">classical_bit</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">reset</span><span class="paren">(</span><span class="var">ancilla</span><span class="paren">)</span>
+
+<span class="kw">def</span> <span class="fn">steane_measure_syndrome</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">d</span>, <span class="var">a</span>, <span class="var">s</span><span class="paren">)</span>:
+    <span class="str">"""
+    Measure all 6 Steane stabilizer generators.
+
+    Syndrome register layout:
+      s[0], s[1], s[2]  ← Z-stabilizers g4, g5, g6 (detect X errors)
+      s[3], s[4], s[5]  ← X-stabilizers g1, g2, g3 (detect Z errors)
+
+    Ancilla register: a[0]..a[5] (one per stabilizer)
+    """</span>
+    <span class="cm"># ── Z-type stabilizers: detect bit-flips (X errors) ────────
+    # g4: Z on q₀, q₂, q₄, q₆  (row r₁ of H)</span>
+    <span class="fn">measure_z_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">0</span>, <span class="var">s</span><span class="paren">)</span>
+    <span class="cm"># g5: Z on q₁, q₂, q₅, q₆  (row r₂ of H)</span>
+    <span class="fn">measure_z_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">1</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">1</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">1</span>, <span class="var">s</span><span class="paren">)</span>
+    <span class="cm"># g6: Z on q₃, q₄, q₅, q₆  (row r₃ of H)</span>
+    <span class="fn">measure_z_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">3</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">2</span>, <span class="var">s</span><span class="paren">)</span>
+
+    <span class="var">qc</span>.<span class="fn">barrier</span><span class="paren">()</span>
+
+    <span class="cm"># ── X-type stabilizers: detect phase-flips (Z errors) ───────
+    # g1: X on q₀, q₂, q₄, q₆  (row r₁ of H)</span>
+    <span class="fn">measure_x_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">3</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">3</span>, <span class="var">s</span><span class="paren">)</span>
+    <span class="cm"># g2: X on q₁, q₂, q₅, q₆  (row r₂ of H)</span>
+    <span class="fn">measure_x_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">1</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">4</span>, <span class="var">s</span><span class="paren">)</span>
+    <span class="cm"># g3: X on q₃, q₄, q₅, q₆  (row r₃ of H)</span>
+    <span class="fn">measure_x_stabilizer</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">a</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="paren">[</span><span class="var">d</span><span class="paren">[</span><span class="num">3</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span>, <span class="var">d</span><span class="paren">[</span><span class="num">6</span><span class="paren">]</span><span class="paren">]</span>, <span class="num">5</span>, <span class="var">s</span><span class="paren">)</span></pre>
+  </div>
+
+  <h3>3. Classical decoder</h3>
+
+  <p>
+    The decoder converts a 6-bit syndrome into a pair of correction masks (one for $X$
+    errors, one for $Z$ errors). Because the syndrome is a binary index, no lookup table
+    is needed — just integer arithmetic.
+  </p>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python — Classical decoder</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">steane_decode_syndrome</span><span class="paren">(</span><span class="var">syndrome_bits</span><span class="paren">)</span>:
+    <span class="str">"""
+    Decode a 6-bit Steane syndrome into (x_correction, z_correction).
+
+    Parameters
+    ----------
+    syndrome_bits : list of 6 bits, [s0..s5], each 0 or 1.
+        s[0], s[1], s[2]  from Z-stabilizers  → identify X errors
+        s[3], s[4], s[5]  from X-stabilizers  → identify Z errors
+
+    Returns
+    -------
+    x_qubit : int or None  — apply X gate here (corrects bit-flip)
+    z_qubit : int or None  — apply Z gate here (corrects phase-flip)
+
+    Decoding formula:
+        syndrome value = s[0]*1 + s[1]*2 + s[2]*4
+        qubit index    = syndrome value - 1    (0-indexed, -1 means no error)
+    """</span>
+    <span class="var">s</span> <span class="op">=</span> <span class="var">syndrome_bits</span>
+
+    <span class="cm"># ── X-error location from Z-stabilizer syndrome ─────────────</span>
+    <span class="var">x_syn</span> <span class="op">=</span> <span class="var">s</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span> <span class="op">*</span> <span class="num">1</span> <span class="op">+</span> <span class="var">s</span><span class="paren">[</span><span class="num">1</span><span class="paren">]</span> <span class="op">*</span> <span class="num">2</span> <span class="op">+</span> <span class="var">s</span><span class="paren">[</span><span class="num">2</span><span class="paren">]</span> <span class="op">*</span> <span class="num">4</span>
+    <span class="var">x_qubit</span> <span class="op">=</span> <span class="var">x_syn</span> <span class="op">-</span> <span class="num">1</span> <span class="kw">if</span> <span class="var">x_syn</span> <span class="op">&gt;</span> <span class="num">0</span> <span class="kw">else</span> <span class="kw">None</span>
+
+    <span class="cm"># ── Z-error location from X-stabilizer syndrome ─────────────</span>
+    <span class="var">z_syn</span> <span class="op">=</span> <span class="var">s</span><span class="paren">[</span><span class="num">3</span><span class="paren">]</span> <span class="op">*</span> <span class="num">1</span> <span class="op">+</span> <span class="var">s</span><span class="paren">[</span><span class="num">4</span><span class="paren">]</span> <span class="op">*</span> <span class="num">2</span> <span class="op">+</span> <span class="var">s</span><span class="paren">[</span><span class="num">5</span><span class="paren">]</span> <span class="op">*</span> <span class="num">4</span>
+    <span class="var">z_qubit</span> <span class="op">=</span> <span class="var">z_syn</span> <span class="op">-</span> <span class="num">1</span> <span class="kw">if</span> <span class="var">z_syn</span> <span class="op">&gt;</span> <span class="num">0</span> <span class="kw">else</span> <span class="kw">None</span>
+
+    <span class="kw">return</span> <span class="var">x_qubit</span>, <span class="var">z_qubit</span>   <span class="cm"># apply X at x_qubit, Z at z_qubit</span></pre>
+  </div>
+
+  <h3>4. Full round-trip: Encode → Error → Correct</h3>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Full Steane error correction circuit</div>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">steane_full_circuit</span><span class="paren">(</span><span class="var">error_qubit</span><span class="op">=</span><span class="kw">None</span>, <span class="var">error_type</span><span class="op">=</span><span class="str">'X'</span>, <span class="var">initial_state</span><span class="op">=</span><span class="str">'0'</span><span class="paren">)</span>:
+    <span class="str">"""
+    Build and simulate a complete Steane error correction round.
+
+    Parameters
+    ----------
+    error_qubit  : int or None   – which data qubit to corrupt (0–6)
+    error_type   : 'X'|'Z'|'Y'  – Pauli error to inject
+    initial_state: '0'|'1'|'+'|'-'
+    """</span>
+    <span class="var">d</span> <span class="op">=</span> <span class="cls">QuantumRegister</span><span class="paren">(</span><span class="num">7</span>,  <span class="str">'d'</span><span class="paren">)</span>  <span class="cm"># data qubits</span>
+    <span class="var">a</span> <span class="op">=</span> <span class="cls">QuantumRegister</span><span class="paren">(</span><span class="num">6</span>,  <span class="str">'a'</span><span class="paren">)</span>  <span class="cm"># ancilla qubits (one per stabilizer)</span>
+    <span class="var">s</span> <span class="op">=</span> <span class="cls">ClassicalRegister</span><span class="paren">(</span><span class="num">6</span>, <span class="str">'s'</span><span class="paren">)</span>  <span class="cm"># syndrome bits</span>
+    <span class="var">qc</span> <span class="op">=</span> <span class="cls">QuantumCircuit</span><span class="paren">(</span><span class="var">d</span>, <span class="var">a</span>, <span class="var">s</span><span class="paren">)</span>
+
+    <span class="cm"># ── Prepare logical input ───────────────────────────────────</span>
+    <span class="kw">if</span> <span class="var">initial_state</span> <span class="op">==</span> <span class="str">'1'</span>: <span class="var">qc</span>.<span class="fn">x</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="kw">if</span> <span class="var">initial_state</span> <span class="op">==</span> <span class="str">'+'</span>: <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="kw">if</span> <span class="var">initial_state</span> <span class="op">==</span> <span class="str">'-'</span>: <span class="var">qc</span>.<span class="fn">x</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span><span class="paren">)</span>; <span class="var">qc</span>.<span class="fn">h</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="num">0</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">barrier</span><span class="paren">()</span>
+
+    <span class="cm"># ── Stage 1: Encode ─────────────────────────────────────────</span>
+    <span class="fn">steane_encode</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">d</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">barrier</span><span class="paren">()</span>
+
+    <span class="cm"># ── Stage 2: Inject error ────────────────────────────────────</span>
+    <span class="kw">if</span> <span class="var">error_qubit</span> <span class="kw">is not</span> <span class="kw">None</span>:
+        <span class="kw">if</span> <span class="str">'X'</span> <span class="kw">in</span> <span class="var">error_type</span>: <span class="var">qc</span>.<span class="fn">x</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">error_qubit</span><span class="paren">]</span><span class="paren">)</span>
+        <span class="kw">if</span> <span class="str">'Z'</span> <span class="kw">in</span> <span class="var">error_type</span>: <span class="var">qc</span>.<span class="fn">z</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">error_qubit</span><span class="paren">]</span><span class="paren">)</span>
+    <span class="var">qc</span>.<span class="fn">barrier</span><span class="paren">()</span>
+
+    <span class="cm"># ── Stage 3: Measure syndrome ────────────────────────────────</span>
+    <span class="fn">steane_measure_syndrome</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">d</span>, <span class="var">a</span>, <span class="var">s</span><span class="paren">)</span>
+
+    <span class="cm"># ── Simulate ─────────────────────────────────────────────────</span>
+    <span class="var">sim</span>    <span class="op">=</span> <span class="cls">AerSimulator</span><span class="paren">()</span>
+    <span class="var">result</span> <span class="op">=</span> <span class="var">sim</span>.<span class="fn">run</span><span class="paren">(</span><span class="var">qc</span>, <span class="var">shots</span><span class="op">=</span><span class="num">1</span><span class="paren">)</span>.<span class="fn">result</span><span class="paren">()</span>
+
+    <span class="var">syndrome_str</span> <span class="op">=</span> <span class="fn">list</span><span class="paren">(</span><span class="var">result</span>.<span class="fn">get_counts</span><span class="paren">().</span><span class="fn">keys</span><span class="paren">())[</span><span class="num">0</span><span class="paren">]</span>
+    <span class="cm"># Qiskit returns classical bits in reversed order — fix it</span>
+    <span class="var">syn_bits</span> <span class="op">=</span> <span class="paren">[</span><span class="fn">int</span><span class="paren">(</span><span class="var">b</span><span class="paren">)</span> <span class="kw">for</span> <span class="var">b</span> <span class="kw">in</span> <span class="fn">reversed</span><span class="paren">(</span><span class="var">syndrome_str</span><span class="paren">)]</span>
+
+    <span class="cm"># ── Decode and correct ───────────────────────────────────────</span>
+    <span class="var">x_q</span>, <span class="var">z_q</span> <span class="op">=</span> <span class="fn">steane_decode_syndrome</span><span class="paren">(</span><span class="var">syn_bits</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"Syndrome bits : {syndrome_str}  (reversed: {syn_bits})"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"X correction  : qubit {x_q}  (apply X gate, or None if no error)"</span><span class="paren">)</span>
+    <span class="fn">print</span><span class="paren">(</span><span class="str">f"Z correction  : qubit {z_q}  (apply Z gate, or None if no error)"</span><span class="paren">)</span>
+    <span class="kw">return</span> <span class="var">qc</span>, <span class="var">syn_bits</span>, <span class="var">x_q</span>, <span class="var">z_q</span></pre>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════ §6 EXAMPLES ═══════════════════════ -->
+<section id="examples">
+  <div class="section-label">Section 06</div>
+  <h2>Error Correction Examples</h2>
+
+  <p>
+    We walk through three canonical scenarios — a bit-flip, a phase-flip, and a combined
+    $Y$ error — showing exactly which syndrome bits flip and how the Hamming-based decoder
+    identifies the faulty qubit in one arithmetic step.
+  </p>
+
+  <!-- ── EXAMPLE 1 ── -->
+  <h3>Example 1 — Bit-Flip ($X$) on qubit $q_3$</h3>
+
+  <p>
+    Suppose the logical state is $|0_L\rangle$ and qubit $q_3$ (the first qubit governed
+    by row $r_3$ of $H$) undergoes a bit-flip $X_3$.
+    The $Z$-type stabilizers detect this error; the $X$-type stabilizers are unaffected.
+  </p>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Syndrome Analysis — X error on q₃</div>
+    <p style="margin-bottom:10px;">
+      An $X$ error anticommutes with $Z$ on the same qubit. We check each $Z$-stabilizer:
+    </p>
+    <p style="margin-bottom:8px;">
+      $g_4 = Z_0Z_2Z_4Z_6$: does not act on $q_3$ → <strong>commutes</strong> → $s[0] = 0$<br>
+      $g_5 = Z_1Z_2Z_5Z_6$: does not act on $q_3$ → <strong>commutes</strong> → $s[1] = 0$<br>
+      $g_6 = Z_3Z_4Z_5Z_6$: acts on $q_3$ → <strong>anticommutes</strong> → $s[2] = 1$
+    </p>
+    <p style="margin-bottom:8px;">
+      $X$ errors commute with all $X$-type stabilizers → $s[3] = s[4] = s[5] = 0$.
+    </p>
+    <p style="margin-bottom:8px;">
+      <strong>Syndrome:</strong> <span class="ic">001 000</span><br>
+      <strong>Z-syndrome value:</strong> $0\cdot1 + 0\cdot2 + 1\cdot4 = 4$<br>
+      <strong>Error qubit:</strong> $4 - 1 = 3$ → $q_3$. ✓<br>
+      <strong>Correction:</strong> Apply $X_3$. No $Z$ correction needed.
+    </p>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Example 1</div>
+    </div>
+    <pre><span class="cm"># Example 1: X error on q₃</span>
+<span class="var">qc</span>, <span class="var">syn</span>, <span class="var">x_q</span>, <span class="var">z_q</span> <span class="op">=</span> <span class="fn">steane_full_circuit</span><span class="paren">(</span>
+    <span class="var">error_qubit</span><span class="op">=</span><span class="num">3</span>,
+    <span class="var">error_type</span><span class="op">=</span><span class="str">'X'</span>,
+    <span class="var">initial_state</span><span class="op">=</span><span class="str">'0'</span>
+<span class="paren">)</span>
+
+<span class="cm"># Expected output:
+# Syndrome bits : 001000   (s[2] = 1)
+# X correction  : qubit 3  (syndrome value 4 → index 3)
+# Z correction  : qubit None</span>
+
+<span class="cm"># Apply correction</span>
+<span class="kw">if</span> <span class="var">x_q</span> <span class="kw">is not</span> <span class="kw">None</span>: <span class="var">qc</span>.<span class="fn">x</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">x_q</span><span class="paren">]</span><span class="paren">)</span>  <span class="cm"># undo the bit-flip</span>
+<span class="kw">if</span> <span class="var">z_q</span> <span class="kw">is not</span> <span class="kw">None</span>: <span class="var">qc</span>.<span class="fn">z</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">z_q</span><span class="paren">]</span><span class="paren">)</span>  <span class="cm"># undo the phase-flip (not needed here)</span></pre>
+  </div>
+
+  <!-- ── EXAMPLE 2 ── -->
+  <h3>Example 2 — Phase-Flip ($Z$) on qubit $q_5$</h3>
+
+  <p>
+    Now suppose qubit $q_5$ suffers a phase flip $Z_5$.
+    The $X$-type stabilizers detect $Z$ errors; the $Z$-type stabilizers are unaffected
+    (since $Z$ commutes with $Z$).
+  </p>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Syndrome Analysis — Z error on q₅</div>
+    <p style="margin-bottom:10px;">
+      A $Z$ error anticommutes with $X$ on the same qubit. We check each $X$-stabilizer:
+    </p>
+    <p style="margin-bottom:8px;">
+      $g_1 = X_0X_2X_4X_6$: does not act on $q_5$ → <strong>commutes</strong> → $s[3] = 0$<br>
+      $g_2 = X_1X_2X_5X_6$: acts on $q_5$ → <strong>anticommutes</strong> → $s[4] = 1$<br>
+      $g_3 = X_3X_4X_5X_6$: acts on $q_5$ → <strong>anticommutes</strong> → $s[5] = 1$
+    </p>
+    <p style="margin-bottom:8px;">
+      $Z$ errors commute with all $Z$-type stabilizers → $s[0] = s[1] = s[2] = 0$.
+    </p>
+    <p style="margin-bottom:8px;">
+      <strong>Syndrome:</strong> <span class="ic">000 011</span><br>
+      <strong>X-syndrome value:</strong> $0\cdot1 + 1\cdot2 + 1\cdot4 = 6$<br>
+      <strong>Error qubit:</strong> $6 - 1 = 5$ → $q_5$. ✓<br>
+      <strong>Correction:</strong> Apply $Z_5$. No $X$ correction needed.
+    </p>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Example 2</div>
+    </div>
+    <pre><span class="cm"># Example 2: Z error on q₅ — test with superposition to stress-test phase</span>
+<span class="var">qc</span>, <span class="var">syn</span>, <span class="var">x_q</span>, <span class="var">z_q</span> <span class="op">=</span> <span class="fn">steane_full_circuit</span><span class="paren">(</span>
+    <span class="var">error_qubit</span><span class="op">=</span><span class="num">5</span>,
+    <span class="var">error_type</span><span class="op">=</span><span class="str">'Z'</span>,
+    <span class="var">initial_state</span><span class="op">=</span><span class="str">'+'</span>   <span class="cm"># |+⟩ = (|0⟩+|1⟩)/√2 stresses phase correction</span>
+<span class="paren">)</span>
+
+<span class="cm"># Expected output:
+# Syndrome bits : 000011   (s[4]=1, s[5]=1)
+# X correction  : qubit None
+# Z correction  : qubit 5  (syndrome value 6 → index 5)</span>
+
+<span class="cm"># The logical |+_L⟩ state is fully recovered after applying Z₅</span></pre>
+  </div>
+
+  <!-- ── EXAMPLE 3 ── -->
+  <h3>Example 3 — Combined ($Y$) Error on qubit $q_2$</h3>
+
+  <p>
+    A $Y = iXZ$ error on qubit $q_2$ triggers <em>both</em> the $Z$-stabilizers (from the
+    $X$ component) and the $X$-stabilizers (from the $Z$ component) simultaneously.
+    Because the two syndromes are completely independent, both errors are identified and
+    corrected separately without interference.
+  </p>
+
+  <div class="callout callout-result">
+    <div class="callout-title">Syndrome Analysis — Y error on q₂</div>
+    <p style="margin-bottom:10px;"><em>From the $X$ component (detected by Z-stabilizers):</em></p>
+    <p style="margin-bottom:8px;">
+      $g_4 = Z_0Z_2Z_4Z_6$: acts on $q_2$ → <strong>anticommutes</strong> → $s[0] = 1$<br>
+      $g_5 = Z_1Z_2Z_5Z_6$: acts on $q_2$ → <strong>anticommutes</strong> → $s[1] = 1$<br>
+      $g_6 = Z_3Z_4Z_5Z_6$: does not act on $q_2$ → <strong>commutes</strong> → $s[2] = 0$
+    </p>
+    <p style="margin-bottom:8px;"><em>From the $Z$ component (detected by X-stabilizers):</em></p>
+    <p style="margin-bottom:8px;">
+      $g_1 = X_0X_2X_4X_6$: acts on $q_2$ → <strong>anticommutes</strong> → $s[3] = 1$<br>
+      $g_2 = X_1X_2X_5X_6$: acts on $q_2$ → <strong>anticommutes</strong> → $s[4] = 1$<br>
+      $g_3 = X_3X_4X_5X_6$: does not act on $q_2$ → <strong>commutes</strong> → $s[5] = 0$
+    </p>
+    <p style="margin-bottom:8px;">
+      <strong>Syndrome:</strong> <span class="ic">110 110</span><br>
+      <strong>Z-syndrome value:</strong> $1\cdot1 + 1\cdot2 + 0\cdot4 = 3$ → error qubit $2$ → apply $X_2$<br>
+      <strong>X-syndrome value:</strong> $1\cdot1 + 1\cdot2 + 0\cdot4 = 3$ → error qubit $2$ → apply $Z_2$<br>
+      <strong>Correction:</strong> Apply both $X_2$ and $Z_2$ (i.e. $Y_2$, up to global phase). ✓
+    </p>
+  </div>
+
+  <div class="code-wrapper">
+    <div class="code-header">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <div class="code-lang">Python · Qiskit — Example 3</div>
+    </div>
+    <pre><span class="cm"># Example 3: Y error on q₂ — verify both syndromes fire at the same qubit</span>
+<span class="var">qc</span>, <span class="var">syn</span>, <span class="var">x_q</span>, <span class="var">z_q</span> <span class="op">=</span> <span class="fn">steane_full_circuit</span><span class="paren">(</span>
+    <span class="var">error_qubit</span><span class="op">=</span><span class="num">2</span>,
+    <span class="var">error_type</span><span class="op">=</span><span class="str">'XZ'</span>,   <span class="cm"># Y = iXZ; inject both X and Z</span>
+    <span class="var">initial_state</span><span class="op">=</span><span class="str">'1'</span>
+<span class="paren">)</span>
+
+<span class="cm"># Expected output:
+# Syndrome bits : 110110   (s[0]=1,s[1]=1, s[3]=1,s[4]=1)
+# X correction  : qubit 2  (Z-syndrome value 3 → index 2)
+# Z correction  : qubit 2  (X-syndrome value 3 → index 2)
+
+# Both corrections applied to the same qubit:
+# X₂ · Z₂ = iY₂ ≡ Y₂ up to global phase → Y error fully reversed.</span>
+
+<span class="kw">if</span> <span class="var">x_q</span> <span class="kw">is not</span> <span class="kw">None</span>: <span class="var">qc</span>.<span class="fn">x</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">x_q</span><span class="paren">]</span><span class="paren">)</span>
+<span class="kw">if</span> <span class="var">z_q</span> <span class="kw">is not</span> <span class="kw">None</span>: <span class="var">qc</span>.<span class="fn">z</span><span class="paren">(</span><span class="var">d</span><span class="paren">[</span><span class="var">z_q</span><span class="paren">]</span><span class="paren">)</span></pre>
+  </div>
+
+  <div class="sep"><span>✦</span></div>
+
+  <!-- ── SUMMARY ── -->
+  <div class="callout callout-idea">
+    <div class="callout-title">Summary — What the Steane Code Achieves</div>
+    <p style="margin-bottom:14px;">
+      The Steane code demonstrates that quantum error correction and classical coding theory
+      are deeply intertwined. By identifying the right classical code — one that contains
+      its own dual — Steane obtained a quantum code that is simultaneously <strong>optimal</strong>
+      (smallest possible for its parameters), <strong>efficient</strong> (decoder runs in
+      constant time via binary arithmetic), and <strong>rich with transversal gates</strong>
+      (entire Clifford group is transversal).
+    </p>
+    <p style="margin-bottom:14px;">
+      The key contrast with the Shor code is architectural: the Shor code fights bit-flips
+      and phase-flips with two separate mechanisms bolted together; the Steane code treats
+      them symmetrically from the outset, with $X$ and $Z$ stabilizers sharing the same
+      support and the same decoder.
+    </p>
+    <p style="margin:0;">
+      The logical next step in this series is the <em>surface code</em> — a topological
+      code that sacrifices the Hamming-based decoder elegance in exchange for a much more
+      favourable physical error threshold (~1%), making it the leading candidate for
+      fault-tolerant quantum computation on near-term hardware.
+    </p>
+  </div>
+
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <div class="series-nav">
+    <a href="#">← Prev: The Shor Code [[9,1,3]]</a>
+    <a href="#">Next: Surface Code (Distance d) →</a>
+  </div>
+  <div>CSS Codes Tutorial Series &nbsp;·&nbsp; Quantum Error Correction</div>
+</footer>
+
+</body>
+</html>
